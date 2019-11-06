@@ -351,3 +351,14 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+Makefile
+*.a
+*.cmake
+CMakeFiles/
+CMakeCache.txt
+exts
+exts/glew/Makefile
+exts/glfw/src/glfw3.pc
+exts/glfw/src/glfw_config.h
+*.out
