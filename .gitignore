@@ -362,3 +362,5 @@ exts/glew/Makefile
 exts/glfw/src/glfw3.pc
 exts/glfw/src/glfw_config.h
 *.out
+
+.vscode
