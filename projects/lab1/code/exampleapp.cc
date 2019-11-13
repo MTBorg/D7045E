@@ -45,6 +45,8 @@ struct Triangle{
 		:q0(q0),a(a),q1(q1){}
 };
 
+int depth = 0;
+
 namespace Example
 {
 
@@ -138,13 +140,19 @@ ExampleApp::Open()
 	App::Open();
 	this->window = new Display::Window;
 	this->window->SetSize(500,500);
-	window->SetKeyPressFunction([this](int32, int32, int32, int32)
+	window->SetKeyPressFunction([this](int32 keyCode, int32, int32, int32)
 	{
-		this->window->Close();
+		static int lastKey = -1;
+		if(keyCode == 256){ //Esc
+			this->window->Close();
+		}else if(keyCode >= 48 && keyCode <= 55){ //key 0 to 7
+			int key = keyCode - 48;
+			if(key != lastKey){
+				lastKey = key;
+				vertices = createSnowFlake(key);
+			}
+		}
 	});
-	
-	// Create koch snowflake
-	vertices = createSnowFlake(2);
 
 	if (this->window->Open())
 	{
@@ -199,11 +207,6 @@ ExampleApp::Open()
 			delete[] buf;
 		}
 
-		// setup vbo
-		glGenBuffers(1, &this->triangle);
-		glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		return true;
 	}
 	return false;
@@ -215,12 +218,21 @@ ExampleApp::Open()
 void
 ExampleApp::Run()
 {
+	// Create koch snowflake
+	vertices = createSnowFlake(5);
+
 	while (this->window->IsOpen())
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
 		this->window->Update();
 
 		// do stuff
+		// setup vbo
+		glGenBuffers(1, &this->triangle);
+		glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
+		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 		glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
 		glUseProgram(this->program);
 		glEnableVertexAttribArray(0);
