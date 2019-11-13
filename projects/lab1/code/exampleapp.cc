@@ -6,6 +6,7 @@
 #include "exampleapp.h"
 #include <cstring>
 #include <glm/glm.hpp>
+#include <glm/vec2.hpp> // glm::vec3
 #include <glm/vec3.hpp> // glm::vec3
 #include <glm/vec4.hpp> // glm::vec4
 #include <glm/mat4x4.hpp> // glm::mat4
@@ -17,13 +18,10 @@
 const GLchar* vs =
 "#version 310 es\n"
 "precision mediump float;\n"
-"layout(location=0) in vec3 pos;\n"
-"layout(location=1) in vec4 color;\n"
-"layout(location=0) out vec4 Color;\n"
+"layout(location=0) in vec2 pos;\n"
 "void main()\n"
 "{\n"
-"	gl_Position = vec4(pos, 1);\n"
-"	Color = color;\n"
+"	gl_Position = vec4(pos, -1, 1);\n"
 "}\n";
 
 const GLchar* ps =
@@ -38,10 +36,10 @@ const GLchar* ps =
 
 using namespace Display;
 
-auto vertices = std::vector<glm::vec3>();
+auto vertices = std::vector<glm::vec2>();
 struct Triangle{
-	glm::vec3 q0, a, q1;
-	Triangle(glm::vec3 q0, glm::vec3 a ,glm::vec3 q1)
+	glm::vec2 q0, a, q1;
+	Triangle(glm::vec2 q0, glm::vec2 a ,glm::vec2 q1)
 		:q0(q0),a(a),q1(q1){}
 };
 
@@ -66,11 +64,11 @@ ExampleApp::~ExampleApp()
 	// empty
 }
 
-glm::vec3 calcNextBase(glm::vec3 a, glm::vec3 b){
+glm::vec2 calcNextBase(glm::vec2 a, glm::vec2 b){
 	return (a * 2.f + b) / 3.f;
 }
 
-Triangle koch_triangle(glm::vec3 p0, glm::vec3 p1, glm::vec3 b){
+Triangle koch_triangle(glm::vec2 p0, glm::vec2 p1, glm::vec2 b){
 	auto q0 = (p0*2.0f+p1)/3.f;
 	auto q1 = (p0+p1*2.0f)/3.f;
 	auto m = (p0 + p1) / 2.f;
@@ -88,7 +86,7 @@ Triangle koch_triangle(glm::vec3 p0, glm::vec3 p1, glm::vec3 b){
 	return Triangle(q0, a, q1);
 }
 
-std::vector<glm::vec3> koch_side(glm::vec3 a,glm::vec3 b, glm::vec3 c, int depth){
+std::vector<glm::vec2> koch_side(glm::vec2 a,glm::vec2 b, glm::vec2 c, int depth){
 	if(depth == 0){
 		return {a,b};
 	}
@@ -102,7 +100,7 @@ std::vector<glm::vec3> koch_side(glm::vec3 a,glm::vec3 b, glm::vec3 c, int depth
 	auto t_3 = koch_side(t.a, t.q1, t.q0, depth - 1);
 	auto t_4 = koch_side(t.q1, b, calcNextBase(b,c), depth-1);
 
-	auto res = std::vector<glm::vec3>();
+	auto res = std::vector<glm::vec2>();
 	res.insert(res.end(), t_1.begin(), t_1.end());
 	res.insert(res.end(), t_2.begin(), t_2.end());
 	res.insert(res.end(), t_3.begin(), t_3.end());
@@ -111,18 +109,18 @@ std::vector<glm::vec3> koch_side(glm::vec3 a,glm::vec3 b, glm::vec3 c, int depth
 	return res;
 }
 
-std::vector<glm::vec3> createSnowFlake(const int depth){
+std::vector<glm::vec2> createSnowFlake(const int depth){
 	//Initial coordinates
-	auto a =	glm::vec3(-0.866f/1.5f, -0.5f/1.5f,0);
-	auto b =	glm::vec3(0.0f/1.5f, 1.0f/1.5f,0);
-	auto c =	glm::vec3(0.866f/1.5f, -0.5f/1.5f,0);
+	auto a =	glm::vec2(-0.866f/1.5f, -0.5f/1.5f);
+	auto b =	glm::vec2(0.0f/1.5f, 1.0f/1.5f);
+	auto c =	glm::vec2(0.866f/1.5f, -0.5f/1.5f);
 
 	// Calculate the sides
 	auto temp_1 = koch_side(a,b,c,depth);
 	auto temp_2 = koch_side(b,c,a,depth);	
 	auto temp_3 = koch_side(c,a,b,depth);
 
-	auto res = std::vector<glm::vec3>();
+	auto res = std::vector<glm::vec2>();
 	res.insert(res.end(), temp_1.begin(), temp_1.end()); 
 	res.insert(res.end(), temp_2.begin(), temp_2.end()); 
 	res.insert(res.end(), temp_3.begin(), temp_3.end()); 
@@ -230,7 +228,7 @@ ExampleApp::Run()
 		// setup vbo
 		glGenBuffers(1, &this->triangle);
 		glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec2), &vertices[0], GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
@@ -239,7 +237,7 @@ ExampleApp::Run()
 		/* glEnableVertexAttribArray(1); */
 		/* glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float32) * 7, NULL); */
 		/* glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(float32) * 7, (GLvoid*)(sizeof(float32) * 3)); */
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), NULL);
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), NULL);
 		/* glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(float32) * 7, (GLvoid*)(sizeof(float32) * vertices.size())); */
 		glDrawArrays(GL_LINE_LOOP, 0, vertices.size());
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
