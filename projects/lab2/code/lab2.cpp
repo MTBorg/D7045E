@@ -13,6 +13,7 @@
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include <vector>
 #include <iostream>
+#include <fstream>
 #include <math.h>
 
 const GLchar* vs =
@@ -36,31 +37,43 @@ const GLchar* ps =
 
 using namespace Display;
 
-namespace Example
-{
+typedef glm::vec2 glvec;
 
-//------------------------------------------------------------------------------
-/**
-*/
-ExampleApp::ExampleApp()
-{
-	// empty
+std::vector<glvec> vertices;
+std::vector<glvec> readFile(std::string file){
+	std::vector<glvec> result;
+	std::ifstream inf(file);
+
+	if(!inf){
+		std::cerr << "Could not read points file";
+		exit(1);
+	}
+	
+	// Read first line 
+	// First line should specify points
+	std::string firstLine;
+	getline(inf, firstLine);
+	size_t lines = std::stoi(firstLine);
+	result.reserve(lines);
+
+	for(size_t i = 0; i < lines; i++){
+		std::string firstNum;
+		inf >> firstNum;
+		std::string secondNum;
+		inf >> secondNum;
+		result.emplace_back(std::stof(firstNum), std::stof(secondNum));
+	}
+
+	return result;
 }
 
-//------------------------------------------------------------------------------
-/**
-*/
-ExampleApp::~ExampleApp()
-{
-	// empty
-}
+namespace Example{
 
-//------------------------------------------------------------------------------
-/**
-*/
-bool
-ExampleApp::Open()
-{
+ExampleApp::ExampleApp(){} 
+ExampleApp::~ExampleApp(){} 
+
+bool ExampleApp::Open(){
+	vertices = readFile("test.txt");
 	App::Open();
 	this->window = new Display::Window;
 	this->window->SetSize(500,500);
@@ -130,9 +143,6 @@ ExampleApp::Open()
 	return false;
 }
 
-//------------------------------------------------------------------------------
-/**
-*/
 void
 ExampleApp::Run()
 {
@@ -145,18 +155,17 @@ ExampleApp::Run()
 		// setup vbo
 		glGenBuffers(1, &this->triangle);
 		glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
-		/* glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec2), &vertices[0], GL_DYNAMIC_DRAW); */
+		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec2), &vertices[0], GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
 		glUseProgram(this->program);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), NULL);
-		/* glDrawArrays(GL_LINE_LOOP, 0, vertices.size()); */
+		glDrawArrays(GL_LINE_LOOP, 0, vertices.size());
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		this->window->SwapBuffers();
 	}
 }
-
-} // namespace Example
+}
