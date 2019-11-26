@@ -16,6 +16,7 @@
 #include <fstream>
 #include <math.h>
 #include <stdlib.h>
+#include <map>
 
 const GLchar* vs =
 "#version 310 es\n"
@@ -110,9 +111,19 @@ bool originIsInConvexHull(const std::vector<glvec>& points){
 	);
 }
 
+bool duplicatePoints(const std::vector<glvec>& points){
+	for(auto it1 = points.begin(); it1 != points.end(); ++it1){
+		for(auto it2 = it1; it2 != points.end(); ++it2){
+			if(*it1 == *it2 && it1 != it2) return true;
+		}
+	}
+	return false;
+}
+
 bool ExampleApp::Open(){
 	vertices = readFile("pointsets/square_outside_origin.txt");
-	printf("%s \n", originIsInConvexHull(vertices) ? "yes" : "no");
+	printf("origin in convex hull: %s \n", originIsInConvexHull(vertices) ? "yes" : "no");
+	printf("duplicate points: %s \n", duplicatePoints(vertices) ? "yes" : "no");
 	/* vertices = generateRandomPoints(5); */
 	App::Open();
 	this->window = new Display::Window;
