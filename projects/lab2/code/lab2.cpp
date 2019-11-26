@@ -85,12 +85,35 @@ namespace Example{
 ExampleApp::ExampleApp(){} 
 ExampleApp::~ExampleApp(){} 
 
-bool ExampleApp::Open(){
-	/* vertices = readFile("test.txt"); */
-	vertices = generateRandomPoints(5);
-	for(auto& t: vertices){
-		printf("%f \n", t.x);
+bool originIsInConvexHull(const std::vector<glvec>& points){
+	//Find min/max values
+	float minX = 1, minY = 1, maxX = -1, maxY = -1;
+	for(const auto& point: points){
+		if(point.x < minX) minX = point.x;
+		if(point.x > maxX) maxX = point.x;
+		if(point.y < minY) minY = point.y;
+		if(point.y > maxY) maxY = point.y;
 	}
+
+	//DEBUG
+	/* printf("%f \n", minX); */
+	/* printf("%f \n", maxX); */
+	/* printf("%f \n", minY); */
+	/* printf("%f \n", maxY); */
+
+	// Check if min/max values surround origin
+	return (
+		minX < 0 &&
+		maxX > 0 &&
+		minY < 0 &&
+		maxY > 0
+	);
+}
+
+bool ExampleApp::Open(){
+	vertices = readFile("pointsets/square_outside_origin.txt");
+	printf("%s \n", originIsInConvexHull(vertices) ? "yes" : "no");
+	/* vertices = generateRandomPoints(5); */
 	App::Open();
 	this->window = new Display::Window;
 	this->window->SetSize(500,500);
