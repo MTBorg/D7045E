@@ -15,6 +15,7 @@
 #include <iostream>
 #include <fstream>
 #include <math.h>
+#include <stdlib.h>
 
 const GLchar* vs =
 "#version 310 es\n"
@@ -67,13 +68,29 @@ std::vector<glvec> readFile(std::string file){
 	return result;
 }
 
+std::vector<glvec> generateRandomPoints(size_t size){
+	auto res = std::vector<glvec>();
+	srand(time(NULL));
+	//TODO: Be able to generate negative values
+	for(size_t i = 0; i < size; i++){
+		res.emplace_back(
+				rand() % 10 / 10.f,
+				rand() % 10 / 10.f);
+	}
+	return res;
+}
+
 namespace Example{
 
 ExampleApp::ExampleApp(){} 
 ExampleApp::~ExampleApp(){} 
 
 bool ExampleApp::Open(){
-	vertices = readFile("test.txt");
+	/* vertices = readFile("test.txt"); */
+	vertices = generateRandomPoints(5);
+	for(auto& t: vertices){
+		printf("%f \n", t.x);
+	}
 	App::Open();
 	this->window = new Display::Window;
 	this->window->SetSize(500,500);
