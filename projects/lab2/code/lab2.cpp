@@ -17,6 +17,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <map>
+#include <algorithm>
 
 const GLchar* vs =
 "#version 310 es\n"
@@ -42,6 +43,8 @@ using namespace Display;
 typedef glm::vec2 glvec;
 
 std::vector<glvec> vertices;
+std::vector<glvec> hull;
+
 std::vector<glvec> readFile(std::string file){
 	std::vector<glvec> result;
 	std::ifstream inf(file);
@@ -96,12 +99,6 @@ bool originIsInConvexHull(const std::vector<glvec>& points){
 		if(point.y > maxY) maxY = point.y;
 	}
 
-	//DEBUG
-	/* printf("%f \n", minX); */
-	/* printf("%f \n", maxX); */
-	/* printf("%f \n", minY); */
-	/* printf("%f \n", maxY); */
-
 	// Check if min/max values surround origin
 	return (
 		minX < 0 &&
@@ -120,11 +117,86 @@ bool duplicatePoints(const std::vector<glvec>& points){
 	return false;
 }
 
+/**
+ * Sort points.
+ *
+ * Sort first by strictly less than then (if equal sort by y)
+ */
+inline void sortPoints(std::vector<glvec>& points){
+	std::sort(
+		points.begin(),
+		points.end(),
+		[](const glvec& v1, const glvec& v2){
+			return (v1.x == v2.x) ? (v1.y < v2.y) : (v1.x < v2.x);
+		}
+	);
+}
+
+/*
+ * Check if the point c lies to the left of (but not on) the line containing 
+ * the line segment a to b.
+ */
+inline bool pointLeftOfLine(
+		const glvec& a,
+		const glvec& b,
+		const glvec& c
+	){
+	return (b.x - a.x)*(c.y - a.y) > (b.y - a.y)*(c.x-a.x);
+}
+
+/*
+ * Compute the convex hull using andrew's algorithm on a set of points.
+ *
+ * Assumes the set of points to contain at least three points (otherwise behavior is
+ * undefined).
+ *
+ * @param points The set of points to perform andrews algorithm on
+ *
+ * @returns A new set of points containing the convex hull (starting from the upper hull)
+ */
+std::vector<glvec> convexHull(const std::vector<glvec> points){
+	//Sort the points
+	auto sortedPoints = points;
+	sortPoints(sortedPoints);
+
+	auto upperHull = std::vector<glvec>(), lowerHull = std::vector<glvec>();
+
+	//Construct upper hull
+	for(const auto& point: sortedPoints){
+		while(
+				upperHull.size() >= 2 &&
+				pointLeftOfLine(*(upperHull.end()-2), *(upperHull.end()-1), point)
+			){
+				upperHull.pop_back();
+		}
+		upperHull.push_back(point);
+	}
+
+	//Construct lower hull
+	for(auto it = sortedPoints.rbegin(); it != sortedPoints.rend(); ++it){
+		while(
+				lowerHull.size() >= 2 &&
+				pointLeftOfLine(*(lowerHull.end()-2), *(lowerHull.end()-1), *it)
+			){
+				lowerHull.pop_back();
+		}
+		lowerHull.push_back(*it);
+	}
+
+	// Remove the last points to remove duplicates
+	upperHull.pop_back();
+	lowerHull.pop_back();
+
+	// Concatenate the hulls
+	upperHull.insert(upperHull.end(), lowerHull.begin(), lowerHull.end());
+	return upperHull;
+}
+
 bool ExampleApp::Open(){
-	vertices = readFile("pointsets/square_outside_origin.txt");
-	printf("origin in convex hull: %s \n", originIsInConvexHull(vertices) ? "yes" : "no");
-	printf("duplicate points: %s \n", duplicatePoints(vertices) ? "yes" : "no");
+	vertices = readFile("pointsets/random.txt");
 	/* vertices = generateRandomPoints(5); */
+	hull = convexHull(vertices);
+
 	App::Open();
 	this->window = new Display::Window;
 	this->window->SetSize(500,500);
@@ -189,6 +261,14 @@ bool ExampleApp::Open(){
 			delete[] buf;
 		}
 
+		// do stuff
+		// setup vbo
+		glGenBuffers(1, &this->triangle);
+		glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
+		glUseProgram(this->program);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), NULL);
+
 		return true;
 	}
 	return false;
@@ -202,18 +282,17 @@ ExampleApp::Run()
 		glClear(GL_COLOR_BUFFER_BIT);
 		this->window->Update();
 
-		// do stuff
-		// setup vbo
-		glGenBuffers(1, &this->triangle);
+		// Draw hull
 		glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
+		glBufferData(GL_ARRAY_BUFFER, hull.size() * sizeof(glm::vec2), &hull[0], GL_DYNAMIC_DRAW);
+		glDrawArrays(GL_LINE_LOOP, 0, hull.size());
+		
+		// Draw vertices
+		glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
+		glPointSize(5);
 		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec2), &vertices[0], GL_DYNAMIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glDrawArrays(GL_POINTS, 0, vertices.size());
 
-		glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
-		glUseProgram(this->program);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), NULL);
-		glDrawArrays(GL_LINE_LOOP, 0, vertices.size());
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		this->window->SwapBuffers();
