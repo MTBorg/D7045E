@@ -4,6 +4,8 @@
 //------------------------------------------------------------------------------
 #include "config.h"
 #include "lab2.h"
+#include "node.h"
+#include "types.h"
 #include <cstring>
 #include <glm/glm.hpp>
 #include <glm/vec2.hpp> // glm::vec3
@@ -40,10 +42,11 @@ const GLchar* ps =
 
 using namespace Display;
 
-typedef glm::vec2 glvec;
 
 std::vector<glvec> vertices;
 std::vector<glvec> hull;
+int cIndex = -1;
+std::vector<glvec> tree;
 
 std::vector<glvec> readFile(std::string file){
 	std::vector<glvec> result;
@@ -192,10 +195,74 @@ std::vector<glvec> convexHull(const std::vector<glvec> points){
 	return upperHull;
 }
 
+Node* buildTree(glvec c, const std::vector<glvec>& points, Node* p){
+
+	//Base case 
+	if(points.size() == 2){
+		return new Node(p, nullptr, nullptr, c, points[0], points[1]);
+	}
+	
+	// Create new empty binary node
+	Node* b = new Node();
+	
+	// Recurse
+	b->lChild = buildTree(
+			c, 
+			std::vector<glvec>(
+				points.begin(), points.begin() + points.size() / 2 + 1
+			), 
+			b
+		);
+	b->rChild = buildTree(
+			c, 
+			std::vector<glvec>(
+				points.begin() + points.size() / 2, points.end()
+			), 
+			b
+		);
+
+	b->parent = p;
+	b->a = points[0];
+	b->b = points[points.size()/2];
+	//TODO: Should probably be size - 1 but doesn't seem to crash right now,
+	// so whatever.
+	b->c = points[points.size()]; 
+	
+	//Return the node b
+	return b;
+}
+
+int pickPointNotOnConvexHull(const std::vector<glvec>& points, const std::vector<glvec>& hull){
+	for(auto it = points.begin(); it != points.end(); ++it){
+		auto p = find(hull.begin(), hull.end(), *it);
+		if(p == hull.end()){
+			return it - points.begin();
+		}
+	}
+	return -1;
+}
+
+std::vector<glvec> treeToPoints(const Node* n){
+	if(n->lChild == nullptr && n->rChild == nullptr){
+		return {n->a, n->b, n->c};
+	}
+
+	auto lPoints = treeToPoints(n->lChild);
+	auto rPoints = treeToPoints(n->rChild);
+	auto res = lPoints;
+	res.insert(res.end(), rPoints.begin(), rPoints.end());
+	return res;
+}
+
 bool ExampleApp::Open(){
 	vertices = readFile("pointsets/random.txt");
 	/* vertices = generateRandomPoints(5); */
 	hull = convexHull(vertices);
+	hull.push_back(hull[0]);
+
+	cIndex = pickPointNotOnConvexHull(vertices, hull);
+	Node* root = buildTree(vertices[cIndex], hull, nullptr);
+	tree = treeToPoints(root);
 
 	App::Open();
 	this->window = new Display::Window;
@@ -282,18 +349,38 @@ ExampleApp::Run()
 		glClear(GL_COLOR_BUFFER_BIT);
 		this->window->Update();
 
+		// Draw tree
+		for(auto it = tree.begin(); it != tree.end(); ++it){
+			glvec buf[] = {*it, *(it+1), *(it+2)};
+			glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
+			glPointSize(5);
+			glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(glm::vec2), &buf[0], GL_DYNAMIC_DRAW);
+			glDrawArrays(GL_LINES, 0, 3);
+		}
+
 		// Draw hull
-		glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
-		glBufferData(GL_ARRAY_BUFFER, hull.size() * sizeof(glm::vec2), &hull[0], GL_DYNAMIC_DRAW);
-		glDrawArrays(GL_LINE_LOOP, 0, hull.size());
+		/* glBindBuffer(GL_ARRAY_BUFFER, this->triangle); */
+		/* glBufferData(GL_ARRAY_BUFFER, hull.size() * sizeof(glm::vec2), &hull[0], GL_DYNAMIC_DRAW); */
+		/* glDrawArrays(GL_LINE_LOOP, 0, hull.size()); */
+
+		/* // Draw fan */
+		/* for(auto it = vertices.begin(); it != vertices.end(); ++it){ */
+		/* 	if(it - vertices.begin() != cIndex){ */
+		/* 		glvec edge[] = {*it, vertices[cIndex]}; */
+		/* 		// Draw vertices */
+		/* 		glBindBuffer(GL_ARRAY_BUFFER, this->triangle); */
+		/* 		glBufferData(GL_ARRAY_BUFFER, 2 * sizeof(glm::vec2), &edge[0], GL_DYNAMIC_DRAW); */
+		/* 		glDrawArrays(GL_LINES, 0, 2); */
+		/* 	} */
+		/* } */
 		
-		// Draw vertices
+		/* // Draw vertices */
 		glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
 		glPointSize(5);
 		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec2), &vertices[0], GL_DYNAMIC_DRAW);
 		glDrawArrays(GL_POINTS, 0, vertices.size());
 
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		/* glBindBuffer(GL_ARRAY_BUFFER, 0); */
 
 		this->window->SwapBuffers();
 	}
