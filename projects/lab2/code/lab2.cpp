@@ -6,12 +6,11 @@
 #include "lab2.h"
 #include "node.h"
 #include "types.h"
+#include "util.h"
+#include "convex_hull.h"
+#include "triangulation.h"
 #include <cstring>
 #include <glm/glm.hpp>
-#include <glm/vec2.hpp> // glm::vec3
-#include <glm/vec3.hpp> // glm::vec3
-#include <glm/vec4.hpp> // glm::vec4
-#include <glm/mat4x4.hpp> // glm::mat4
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include <vector>
 #include <iostream>
@@ -92,167 +91,6 @@ namespace Example{
 ExampleApp::ExampleApp(){} 
 ExampleApp::~ExampleApp(){} 
 
-bool originIsInConvexHull(const std::vector<glvec>& points){
-	//Find min/max values
-	float minX = 1, minY = 1, maxX = -1, maxY = -1;
-	for(const auto& point: points){
-		if(point.x < minX) minX = point.x;
-		if(point.x > maxX) maxX = point.x;
-		if(point.y < minY) minY = point.y;
-		if(point.y > maxY) maxY = point.y;
-	}
-
-	// Check if min/max values surround origin
-	return (
-		minX < 0 &&
-		maxX > 0 &&
-		minY < 0 &&
-		maxY > 0
-	);
-}
-
-bool duplicatePoints(const std::vector<glvec>& points){
-	for(auto it1 = points.begin(); it1 != points.end(); ++it1){
-		for(auto it2 = it1; it2 != points.end(); ++it2){
-			if(*it1 == *it2 && it1 != it2) return true;
-		}
-	}
-	return false;
-}
-
-/**
- * Sort points.
- *
- * Sort first by strictly less than then (if equal sort by y)
- */
-inline void sortPoints(std::vector<glvec>& points){
-	std::sort(
-		points.begin(),
-		points.end(),
-		[](const glvec& v1, const glvec& v2){
-			return (v1.x == v2.x) ? (v1.y < v2.y) : (v1.x < v2.x);
-		}
-	);
-}
-
-/*
- * Check if the point c lies to the left of (but not on) the line containing 
- * the line segment a to b.
- */
-inline bool pointLeftOfLine(
-		const glvec& a,
-		const glvec& b,
-		const glvec& c
-	){
-	return (b.x - a.x)*(c.y - a.y) > (b.y - a.y)*(c.x-a.x);
-}
-
-/*
- * Compute the convex hull using andrew's algorithm on a set of points.
- *
- * Assumes the set of points to contain at least three points (otherwise behavior is
- * undefined).
- *
- * @param points The set of points to perform andrews algorithm on
- *
- * @returns A new set of points containing the convex hull (starting from the upper hull)
- */
-std::vector<glvec> convexHull(const std::vector<glvec> points){
-	//Sort the points
-	auto sortedPoints = points;
-	sortPoints(sortedPoints);
-
-	auto upperHull = std::vector<glvec>(), lowerHull = std::vector<glvec>();
-
-	//Construct upper hull
-	for(const auto& point: sortedPoints){
-		while(
-				upperHull.size() >= 2 &&
-				pointLeftOfLine(*(upperHull.end()-2), *(upperHull.end()-1), point)
-			){
-				upperHull.pop_back();
-		}
-		upperHull.push_back(point);
-	}
-
-	//Construct lower hull
-	for(auto it = sortedPoints.rbegin(); it != sortedPoints.rend(); ++it){
-		while(
-				lowerHull.size() >= 2 &&
-				pointLeftOfLine(*(lowerHull.end()-2), *(lowerHull.end()-1), *it)
-			){
-				lowerHull.pop_back();
-		}
-		lowerHull.push_back(*it);
-	}
-
-	// Remove the last points to remove duplicates
-	upperHull.pop_back();
-	lowerHull.pop_back();
-
-	// Concatenate the hulls
-	upperHull.insert(upperHull.end(), lowerHull.begin(), lowerHull.end());
-	return upperHull;
-}
-
-Node* buildTree(glvec c, const std::vector<glvec>& points, Node* p){
-
-	//Base case 
-	if(points.size() == 2){
-		return new Node(p, nullptr, nullptr, c, points[0], points[1]);
-	}
-	
-	// Create new empty binary node
-	Node* b = new Node();
-	
-	// Recurse
-	b->lChild = buildTree(
-			c, 
-			std::vector<glvec>(
-				points.begin(), points.begin() + points.size() / 2 + 1
-			), 
-			b
-		);
-	b->rChild = buildTree(
-			c, 
-			std::vector<glvec>(
-				points.begin() + points.size() / 2, points.end()
-			), 
-			b
-		);
-
-	b->parent = p;
-	b->a = points[0];
-	b->b = points[points.size()/2];
-	//TODO: Should probably be size - 1 but doesn't seem to crash right now,
-	// so whatever.
-	b->c = points[points.size()]; 
-	
-	//Return the node b
-	return b;
-}
-
-int pickPointNotOnConvexHull(const std::vector<glvec>& points, const std::vector<glvec>& hull){
-	for(auto it = points.begin(); it != points.end(); ++it){
-		auto p = find(hull.begin(), hull.end(), *it);
-		if(p == hull.end()){
-			return it - points.begin();
-		}
-	}
-	return -1;
-}
-
-std::vector<glvec> treeToPoints(const Node* n){
-	if(n->lChild == nullptr && n->rChild == nullptr){
-		return {n->a, n->b, n->c};
-	}
-
-	auto lPoints = treeToPoints(n->lChild);
-	auto rPoints = treeToPoints(n->rChild);
-	auto res = lPoints;
-	res.insert(res.end(), rPoints.begin(), rPoints.end());
-	return res;
-}
 
 bool ExampleApp::Open(){
 	vertices = readFile("pointsets/random.txt");
