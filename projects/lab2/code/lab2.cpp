@@ -7,6 +7,7 @@
 #include "node.h"
 #include "types.h"
 #include "util.h"
+#include "validation.h"
 #include "convex_hull.h"
 #include "triangulation.h"
 #include <cstring>
@@ -92,15 +93,38 @@ namespace Example{
 ExampleApp::ExampleApp(){} 
 ExampleApp::~ExampleApp(){} 
 
-
 bool ExampleApp::Open(){
-	vertices = readFile("pointsets/square_tree_insert_1.txt");
-	/* vertices = generateRandomPoints(5); */
-	hull = convexHull(vertices);
-	hull.push_back(hull[0]);
+	/* vertices = readFile("pointsets/square_tree_insert_1.txt"); */
 
-	cIndex = pickPointNotOnConvexHull(vertices, hull);
-	Node* root = buildTree(vertices[cIndex], hull, nullptr);
+	printf("generating points...\n");
+	do{
+		vertices = generateRandomPoints(10);
+		/* vertices = readFile("pointsets/bug_case_5.txt"); */
+		hull = convexHull(vertices);
+	}while(
+			!validation::originIsInConvexHull(hull) ||
+			validation::duplicatePoints(vertices)
+	);
+
+	
+	// Create new hull with the first element appended as the last
+	auto hullTemp = hull;
+	hullTemp.push_back(hullTemp[0]);
+
+	// Initial fan triangulation
+	cIndex = pickPointNotOnConvexHull(vertices, hullTemp);
+	Node* root = buildTree(vertices[cIndex], hullTemp, nullptr);
+
+	// Insert the rest of the points that's not on the hull and is not
+	// the point for the initial fan triangulation
+	for(const auto& point: vertices){
+		/* printf("x: %f, y: %f\n", point.x, point.y); */
+		auto res = std::find(hull.begin(), hull.end(), point);
+		if(res == hull.end() && point != vertices[cIndex]){
+			insertPointIntoTree(point, root);
+		}
+	}
+	
 	tree = treeToPoints(root);
 
 	App::Open();
@@ -189,18 +213,19 @@ ExampleApp::Run()
 		this->window->Update();
 
 		// Draw tree
-		for(auto it = tree.begin(); it != tree.end(); ++it){
+		for(auto it = tree.begin(); it != tree.end() - 2; ++it){
 			glvec buf[] = {*it, *(it+1), *(it+2)};
 			glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
-			glPointSize(5);
+			glLineWidth(1);
 			glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(glm::vec2), &buf[0], GL_DYNAMIC_DRAW);
 			glDrawArrays(GL_LINES, 0, 3);
 		}
 
 		// Draw hull
-		/* glBindBuffer(GL_ARRAY_BUFFER, this->triangle); */
-		/* glBufferData(GL_ARRAY_BUFFER, hull.size() * sizeof(glm::vec2), &hull[0], GL_DYNAMIC_DRAW); */
-		/* glDrawArrays(GL_LINE_LOOP, 0, hull.size()); */
+		glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
+		glLineWidth(5);
+		glBufferData(GL_ARRAY_BUFFER, hull.size() * sizeof(glm::vec2), &hull[0], GL_DYNAMIC_DRAW);
+		glDrawArrays(GL_LINE_LOOP, 0, hull.size());
 
 		/* // Draw fan */
 		/* for(auto it = vertices.begin(); it != vertices.end(); ++it){ */
@@ -213,12 +238,18 @@ ExampleApp::Run()
 		/* 	} */
 		/* } */
 		
-		/* // Draw vertices */
+		// Draw vertices
 		glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
-		glPointSize(5);
+		glPointSize(10);
 		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec2), &vertices[0], GL_DYNAMIC_DRAW);
 		glDrawArrays(GL_POINTS, 0, vertices.size());
 
+		// Draw origin
+		/* glvec origin = glvec(0,0); */
+		/* glBindBuffer(GL_ARRAY_BUFFER, this->triangle); */
+		/* glPointSize(8); */
+		/* glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2), &origin, GL_DYNAMIC_DRAW); */
+		/* glDrawArrays(GL_POINTS, 0, 1); */
 		/* glBindBuffer(GL_ARRAY_BUFFER, 0); */
 
 		this->window->SwapBuffers();

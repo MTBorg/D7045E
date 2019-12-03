@@ -43,25 +43,34 @@ Node* buildTree(glvec c, const std::vector<glvec>& points, Node* p){
 }
 
 bool pointIsInSector(const glvec& point, const Node* sector){
-	return 
-		(pointLeftOfLine(sector->ci, sector->c, point) &&
-		 !pointLeftOfLine(sector->cm, sector->c, point)) ||
-		(pointLeftOfLine(sector->cm, sector->c, point) &&
-		 !pointLeftOfLine(sector->cj, sector->c, point));
-	//Case 1 
-	/* if(!pointLeftOfLine(sector->cm, sector->c, sector->ci)){ */
-	/* 	return pointLeftOfLine(sector->ci, sector->c, point) && */
-	/* 		!pointLeftOfLine(sector->cm, sector->c, point); */
-	/* } */
-	
-	//Case 2
-	/* if(!pointLeftOfLine(sector->cm, sector->c, sector->ci)){ */
-	/* 	// PROBLEM: This return true when false because it receives the same two points */
-	/* 	return !pointLeftOfLine(sector->ci, sector->c, point) || */
-	/* 		pointLeftOfLine(sector->c, sector->ci, point); */
-	/* } */
+	bool case1 =
+	!pointLeftOfLine(sector->c, sector->cm, sector->ci) && (
+			(
+				//Between cm->c and ci->c
+				pointLeftOfLine(sector->ci, sector->c, point) ||
+				!pointLeftOfLine(sector->cm, sector->c, point)
+			) ||
+			(
+				//Between cm->c and cj->c
+				pointLeftOfLine(sector->cm, sector->c, point) &&
+			 !pointLeftOfLine(sector->cj, sector->c, point)
+			) 
+	);
 
-	return false;
+	bool case2 = 
+	pointLeftOfLine(sector->c, sector->cm, sector->ci) && (
+		 	//Between cm->c and cj->c
+			(pointLeftOfLine(sector->cm, sector->c, point) &&
+			!pointLeftOfLine(sector->cj, sector->c, point)
+			) ||
+			(
+				// Between ci->c and cm->c
+				pointLeftOfLine(sector->ci, sector->c, point) &&
+			 	!pointLeftOfLine(sector->cm, sector->c, point)
+			)
+		);
+
+	return case1 || case2;
 }
 
 void insertPointIntoTree(const glvec& point, Node* root){
@@ -98,6 +107,6 @@ void insertPointIntoTree(const glvec& point, Node* root){
 			return;
 		}
 	}
-	
+
 	printf("THIS SHOULD NOT BE REACHED\n");
 }

@@ -23,6 +23,7 @@ std::vector<glvec> convexHull(const std::vector<glvec> points){
 		upperHull.push_back(point);
 	}
 
+
 	//Construct lower hull
 	for(auto it = sortedPoints.rbegin(); it != sortedPoints.rend(); ++it){
 		while(
