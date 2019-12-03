@@ -13,13 +13,22 @@ int pickPointNotOnConvexHull(const std::vector<glvec>& points, const std::vector
 }
 
 std::vector<glvec> treeToPoints(const Node* n){
-	if(n->lChild == nullptr && n->rChild == nullptr){
-		return {n->a, n->b, n->c};
+	if(n->s1 == nullptr && n->s2 == nullptr && n->s3 == nullptr){
+		return {n->ci, n->cm, n->cj};
 	}
 
-	auto lPoints = treeToPoints(n->lChild);
-	auto rPoints = treeToPoints(n->rChild);
-	auto res = lPoints;
-	res.insert(res.end(), rPoints.begin(), rPoints.end());
+	auto res = std::vector<glvec>();
+	if(n->s1 != nullptr){
+		auto points = treeToPoints(n->s1);
+		res.insert(res.end(), points.begin(), points.end());
+	}
+	if(n->s2 != nullptr){
+		auto points = treeToPoints(n->s2);
+		res.insert(res.end(), points.begin(), points.end());
+	}
+	if(n->s3 != nullptr){
+		auto points = treeToPoints(n->s3);
+		res.insert(res.end(), points.begin(), points.end());
+	}
 	return res;
 }

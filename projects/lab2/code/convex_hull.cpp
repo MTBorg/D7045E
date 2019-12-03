@@ -1,4 +1,6 @@
 #include "convex_hull.h"
+#include <iostream>
+#include <algorithm>
 
 #include "util.h"
 
@@ -6,6 +8,7 @@ std::vector<glvec> convexHull(const std::vector<glvec> points){
 	//Sort the points
 	auto sortedPoints = points;
 	sortPoints(sortedPoints);
+	/* std::reverse(sortedPoints.begin(), sortedPoints.end()); */
 
 	auto upperHull = std::vector<glvec>(), lowerHull = std::vector<glvec>();
 

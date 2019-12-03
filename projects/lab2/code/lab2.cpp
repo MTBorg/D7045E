@@ -93,7 +93,7 @@ ExampleApp::~ExampleApp(){}
 
 
 bool ExampleApp::Open(){
-	vertices = readFile("pointsets/random.txt");
+	vertices = readFile("pointsets/square_tree_insert_1.txt");
 	/* vertices = generateRandomPoints(5); */
 	hull = convexHull(vertices);
 	hull.push_back(hull[0]);
