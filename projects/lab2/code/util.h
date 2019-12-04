@@ -38,4 +38,8 @@ int pickPointNotOnConvexHull(const std::vector<glvec>& points, const std::vector
 
 std::vector<glvec> treeToPoints(const Node* n);
 
+// Check if a point is in sector between the clockwise sector beetween the lines
+// ci->c and cm->c
+bool pointInSector(const glvec& point, const glvec& c, const glvec& ci, const glvec& cm);
+
 #endif

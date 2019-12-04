@@ -105,7 +105,6 @@ bool ExampleApp::Open(){
 			!validation::originIsInConvexHull(hull) ||
 			validation::duplicatePoints(vertices)
 	);
-
 	
 	// Create new hull with the first element appended as the last
 	auto hullTemp = hull;
@@ -115,17 +114,17 @@ bool ExampleApp::Open(){
 	cIndex = pickPointNotOnConvexHull(vertices, hullTemp);
 	Node* root = buildTree(vertices[cIndex], hullTemp, nullptr);
 
-	// Insert the rest of the points that's not on the hull and is not
-	// the point for the initial fan triangulation
-	for(const auto& point: vertices){
-		/* printf("x: %f, y: %f\n", point.x, point.y); */
-		auto res = std::find(hull.begin(), hull.end(), point);
-		if(res == hull.end() && point != vertices[cIndex]){
-			insertPointIntoTree(point, root);
-		}
-	}
+	/* // Insert the rest of the points that's not on the hull and is not */
+	/* // the point for the initial fan triangulation */
+	/* for(const auto& point: vertices){ */
+	/* 	/1* printf("x: %f, y: %f\n", point.x, point.y); *1/ */
+	/* 	auto res = std::find(hull.begin(), hull.end(), point); */
+	/* 	if(res == hull.end() && point != vertices[cIndex]){ */
+	/* 		insertPointIntoTree(point, root); */
+	/* 	} */
+	/* } */
 	
-	tree = treeToPoints(root);
+	tree = root->toPointVec();
 
 	App::Open();
 	this->window = new Display::Window;

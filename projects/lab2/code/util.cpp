@@ -12,23 +12,31 @@ int pickPointNotOnConvexHull(const std::vector<glvec>& points, const std::vector
 	return -1;
 }
 
-std::vector<glvec> treeToPoints(const Node* n){
-	if(n->s1 == nullptr && n->s2 == nullptr && n->s3 == nullptr){
-		return {n->ci, n->cm, n->cj};
-	}
+/* std::vector<glvec> treeToPoints(const Node* n){ */
+/* 	if(n->s1 == nullptr && n->s2 == nullptr && n->s3 == nullptr){ */
+/* 		return {n->ci, n->cm, n->cj}; */
+/* 	} */
 
-	auto res = std::vector<glvec>();
-	if(n->s1 != nullptr){
-		auto points = treeToPoints(n->s1);
-		res.insert(res.end(), points.begin(), points.end());
+/* 	auto res = std::vector<glvec>(); */
+/* 	if(n->s1 != nullptr){ */
+/* 		auto points = treeToPoints(n->s1); */
+/* 		res.insert(res.end(), points.begin(), points.end()); */
+/* 	} */
+/* 	if(n->s2 != nullptr){ */
+/* 		auto points = treeToPoints(n->s2); */
+/* 		res.insert(res.end(), points.begin(), points.end()); */
+/* 	} */
+/* 	if(n->s3 != nullptr){ */
+/* 		auto points = treeToPoints(n->s3); */
+/* 		res.insert(res.end(), points.begin(), points.end()); */
+/* 	} */
+/* 	return res; */
+/* } */
+
+
+bool pointInSector(const glvec& point, const glvec& c, const glvec& ci, const glvec& cm){
+	if(pointLeftOfLine(cm, c, ci)){
+		return pointLeftOfLine(cm, c, point) || !pointLeftOfLine(ci, c, point);
 	}
-	if(n->s2 != nullptr){
-		auto points = treeToPoints(n->s2);
-		res.insert(res.end(), points.begin(), points.end());
-	}
-	if(n->s3 != nullptr){
-		auto points = treeToPoints(n->s3);
-		res.insert(res.end(), points.begin(), points.end());
-	}
-	return res;
+	return pointLeftOfLine(ci, c, point) && !pointLeftOfLine(cm, c, point);
 }
