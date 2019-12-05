@@ -2,6 +2,8 @@
 
 #include "types.h"
 
+#include <iostream>
+
 int pickPointNotOnConvexHull(const std::vector<glvec>& points, const std::vector<glvec>& hull){
 	for(auto it = points.begin(); it != points.end(); ++it){
 		auto p = find(hull.begin(), hull.end(), *it);
@@ -35,8 +37,13 @@ int pickPointNotOnConvexHull(const std::vector<glvec>& points, const std::vector
 
 
 bool pointInSector(const glvec& point, const glvec& c, const glvec& ci, const glvec& cm){
+	/* printf("p-x: %f, p-y: %f\n", point.x, point.y); */
+	/* printf("c-x: %f, c-y: %f\n", c.x, c.y); */
+	/* printf("ci-x: %f, ci-y: %f\n", ci.x, ci.y); */
+	/* printf("cm-x: %f, cm-y: %f\n", cm.x, cm.y); */
+	/* printf("\n"); */
 	if(pointLeftOfLine(cm, c, ci)){
-		return pointLeftOfLine(cm, c, point) || !pointLeftOfLine(ci, c, point);
+		return !pointLeftOfLine(cm, c, point) || pointLeftOfLine(ci, c, point);
 	}
 	return pointLeftOfLine(ci, c, point) && !pointLeftOfLine(cm, c, point);
 }
