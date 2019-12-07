@@ -30,20 +30,22 @@ Node* BinaryNode::insertPoint(const glvec& point){
 		s1 = s1->insertPoint(point);
 		//The root should always update both subtrees
 		if(this->isRoot()) s2 = s2->insertPoint(point); 
-	} else if(pointOnLine(point, c, cm)){
+	} else if(pointOnLine(point, c, cm)){ //On the line inbetween both sectors
 		s1 = s1->insertPoint(point);
 		s2 = s2->insertPoint(point);
 	}else if(pointOnLine(point, c, cj)){
 		s2 = s2->insertPoint(point);
 		//The root should always update both subtrees
 		if(this->isRoot()) s1 = s1->insertPoint(point);
-	}else if(pointOnLine(point, ci, cm)){
+	}else if( // On ci->cm or in first sector
+		pointOnLine(point, ci, cm) || 
+		pointInSector(point, c, ci, cm) 
+	){
 		s1 = s1->insertPoint(point);
-	}else if(pointOnLine(point, cm, cj)){
-		s2 = s2->insertPoint(point);
-	} else if(pointInSector(point, c, ci, cm)){
-		s1 = s1->insertPoint(point);
-	}else if(pointInSector(point, c, cm, cj)){
+	}else if( // On ci->cm or in second sector
+		pointOnLine(point, cm, cj) ||
+		pointInSector(point, c, cm, cj)
+	){
 		s2 = s2->insertPoint(point);
 	}else{
 		printf("POINT NOT FOUND: THIS SHOULD NEVER BE REACHED\n");

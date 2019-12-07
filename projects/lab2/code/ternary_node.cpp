@@ -1,6 +1,7 @@
 #include "ternary_node.h"
 
 #include <vector>
+#include <iostream>
 
 #include "types.h"
 #include "util.h"
@@ -28,7 +29,22 @@ std::vector<glvec> TernaryNode::toPointVec(){
 }
 
 Node* TernaryNode::insertPoint(const glvec& point){
-	if(pointInSector(point, this->c, this->ci, this->cm)){
+	if(
+		pointOnLine(point, this->c, this->ci) ||
+		pointOnLine(point, this->c, this->cj)
+	){
+		s1 = s1->insertPoint(point);
+		s3 = s3->insertPoint(point);
+	}else if(pointOnLine(point, this->c, this->cm)){
+		s1 = s1->insertPoint(point);
+		s2 = s2->insertPoint(point);
+	}else if(pointOnLine(point, ci, cm)){
+		s1 = s1->insertPoint(point);
+	}else if(pointOnLine(point, cm, cj)){
+		s2 = s2->insertPoint(point);
+	}else if(pointOnLine(point, cj, ci)){
+		s3 = s3->insertPoint(point);
+	}else if(pointInSector(point, this->c, this->ci, this->cm)){
 		s1 = s1->insertPoint(point);
 	}else if(pointInSector(point, this->c, this->cm, this->cj)){
 		s2 = s2->insertPoint(point);
