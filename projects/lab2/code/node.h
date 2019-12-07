@@ -11,6 +11,7 @@ public:
 
 	virtual std::vector<glvec> toPointVec() = 0;
 	virtual Node* insertPoint(const glvec& point) = 0;
+	inline bool isRoot(){return parent == nullptr;}
 
 	Node(){}
 	Node(Node* parent):parent(parent){}

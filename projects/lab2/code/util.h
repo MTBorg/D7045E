@@ -34,9 +34,18 @@ inline bool pointLeftOfLine(
 	return (b.x - a.x)*(c.y - a.y) > (b.y - a.y)*(c.x-a.x);
 }
 
-int pickPointNotOnConvexHull(const std::vector<glvec>& points, const std::vector<glvec>& hull);
+/*
+ * Check if the point c lies on the line containing the line segment a to b.
+ */
+inline bool pointOnLine(
+		const glvec& a,
+		const glvec& b,
+		const glvec& c
+	){
+	return (b.x - a.x)*(c.y - a.y) == (b.y - a.y)*(c.x-a.x);
+}
 
-std::vector<glvec> treeToPoints(const Node* n);
+int pickPointNotOnConvexHull(const std::vector<glvec>& points, const std::vector<glvec>& hull);
 
 // Check if a point is in sector between the clockwise sector beetween the lines
 // ci->c and cm->c

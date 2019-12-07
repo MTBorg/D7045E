@@ -104,8 +104,8 @@ bool ExampleApp::Open(){
 			!validation::originIsInConvexHull(hull) ||
 			validation::duplicatePoints(vertices)
 	);
-	/* vertices = readFile("pointsets/triangle.txt"); */
-	/* 	hull = convexHull(vertices); */
+	vertices = readFile("pointsets/line_instersect_test.txt");
+		hull = convexHull(vertices);
 	
 	// Create new hull with the first element appended as the last
 	auto hullTemp = hull;

@@ -26,12 +26,27 @@ std::vector<glvec> BinaryNode::toPointVec(){
 }
 
 Node* BinaryNode::insertPoint(const glvec& point){
-	if(pointInSector(point, this->c, this->ci, this->cm)){
-		this->s1 = this->s1->insertPoint(point);
-	}else if(pointInSector(point, this->c, this->cm, this->cj)){
-		this->s2 = this->s2->insertPoint(point);
+	if(pointOnLine(point, this->c, this->ci)){
+		s1 = s1->insertPoint(point);
+		//The root should always update both subtrees
+		if(this->isRoot()) s2 = s2->insertPoint(point); 
+	} else if(pointOnLine(point, c, cm)){
+		s1 = s1->insertPoint(point);
+		s2 = s2->insertPoint(point);
+	}else if(pointOnLine(point, c, cj)){
+		s2 = s2->insertPoint(point);
+		//The root should always update both subtrees
+		if(this->isRoot()) s1 = s1->insertPoint(point);
+	}else if(pointOnLine(point, ci, cm)){
+		s1 = s1->insertPoint(point);
+	}else if(pointOnLine(point, cm, cj)){
+		s2 = s2->insertPoint(point);
+	} else if(pointInSector(point, c, ci, cm)){
+		s1 = s1->insertPoint(point);
+	}else if(pointInSector(point, c, cm, cj)){
+		s2 = s2->insertPoint(point);
 	}else{
-		printf("THIS SHOULD NEVER BE REACHED\n");
+		printf("POINT NOT FOUND: THIS SHOULD NEVER BE REACHED\n");
 	}
 	return this;
 }
