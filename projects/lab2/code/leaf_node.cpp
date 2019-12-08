@@ -36,8 +36,8 @@ Node* LeafNode::insertPoint(const glvec& point){
 	}else if(pointOnLine(this->ci, this->cm, point)){ // On ci->cm
 		BinaryNode* b = new BinaryNode();
 		b->parent = this->parent;
-		b->s1 = new LeafNode(b, point, this->c, this->ci);
-		b->s2 = new LeafNode(b, point, this->ci, this->cm);
+		b->s1 = new LeafNode(b, point, this->cm, this->c);
+		b->s2 = new LeafNode(b, point, this->ci, this->c);
 		b->c = point;
 		b->ci = this->cm;
 		b->cm = this->c;

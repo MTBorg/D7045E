@@ -38,11 +38,11 @@ Node* BinaryNode::insertPoint(const glvec& point){
 		//The root should always update both subtrees
 		if(this->isRoot()) s1 = s1->insertPoint(point);
 	}else if( // On ci->cm or in first sector
-		pointOnLine(point, ci, cm) || 
+		(pointOnLine(point, ci, cm) && !pointLeftOfLine(cm, c, ci)) || 
 		pointInSector(point, c, ci, cm) 
 	){
 		s1 = s1->insertPoint(point);
-	}else if( // On ci->cm or in second sector
+	}else if( // On cm->cj or in second sector
 		pointOnLine(point, cm, cj) ||
 		pointInSector(point, c, cm, cj)
 	){

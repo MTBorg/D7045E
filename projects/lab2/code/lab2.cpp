@@ -98,14 +98,15 @@ bool ExampleApp::Open(){
 
 	printf("generating points...\n");
 	do{
-		vertices = generateRandomPoints(10);
+		vertices = generateRandomPoints(25);
 		hull = convexHull(vertices);
 	}while(
 			!validation::originIsInConvexHull(hull) ||
 			validation::duplicatePoints(vertices)
 	);
-	vertices = readFile("pointsets/line_instersect_test.txt");
-		hull = convexHull(vertices);
+	/* vertices = readFile("pointsets/bug_case_9.txt"); */
+	/* 	hull = convexHull(vertices); */
+
 	
 	// Create new hull with the first element appended as the last
 	auto hullTemp = hull;

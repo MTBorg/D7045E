@@ -29,27 +29,29 @@ std::vector<glvec> TernaryNode::toPointVec(){
 }
 
 Node* TernaryNode::insertPoint(const glvec& point){
-	if(
-		pointOnLine(point, this->c, this->ci) ||
-		pointOnLine(point, this->c, this->cj)
-	){
+	if( pointOnLine(point, c, ci)){
 		s1 = s1->insertPoint(point);
 		s3 = s3->insertPoint(point);
-	}else if(pointOnLine(point, this->c, this->cm)){
+	}else if(pointOnLine(point, c, cm)){
 		s1 = s1->insertPoint(point);
 		s2 = s2->insertPoint(point);
+	}else if(pointOnLine(point, c, cj)){
+		s2 = s2->insertPoint(point);
+		s3 = s3->insertPoint(point);
 	}else if(pointOnLine(point, ci, cm)){
 		s1 = s1->insertPoint(point);
 	}else if(pointOnLine(point, cm, cj)){
 		s2 = s2->insertPoint(point);
 	}else if(pointOnLine(point, cj, ci)){
 		s3 = s3->insertPoint(point);
-	}else if(pointInSector(point, this->c, this->ci, this->cm)){
+	}else if(pointInSector(point, c, ci, cm)){
 		s1 = s1->insertPoint(point);
-	}else if(pointInSector(point, this->c, this->cm, this->cj)){
+	}else if(pointInSector(point, c, cm, cj)){
 		s2 = s2->insertPoint(point);
-	}else{
+	}else if(pointInSector(point, c, cj, ci)){
 		s3 = s3->insertPoint(point);
+	}else{
+		printf("POINT NOT FOUND IN TERNARY NODE: THIS SHOULD NEVER HAPPEN\n");
 	}
 	return this;
 }

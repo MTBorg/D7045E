@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <algorithm>
+#include <math.h>
+#include <glm/glm.hpp>   
 
 #include "types.h"
 #include "node.h"
@@ -35,14 +37,16 @@ inline bool pointLeftOfLine(
 }
 
 /*
- * Check if the point c lies on the line containing the line segment a to b.
+ * Check if the point c lies on the line containing the line segment a to b,
+ * but only on the side starting from a going towards b.
  */
 inline bool pointOnLine(
+		const glvec& point,
 		const glvec& a,
-		const glvec& b,
-		const glvec& c
+		const glvec& b
 	){
-	return (b.x - a.x)*(c.y - a.y) == (b.y - a.y)*(c.x-a.x);
+	return ((b.x - a.x)*(point.y - a.y) == (b.y - a.y)*(point.x-a.x)) &&
+		(glm::normalize(b-a) == glm::normalize(point-a));
 }
 
 int pickPointNotOnConvexHull(const std::vector<glvec>& points, const std::vector<glvec>& hull);
