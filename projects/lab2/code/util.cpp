@@ -20,3 +20,12 @@ bool pointInSector(const glvec& point, const glvec& c, const glvec& ci, const gl
 	}
 	return pointLeftOfLine(ci, c, point) && !pointLeftOfLine(cm, c, point);
 }
+
+std::vector<glvec> removeDuplicates(std::vector<glvec> points){
+	auto end = points.end();
+	for(auto it = points.begin(); it != end; ++it){
+		end = std::remove(it+1, end, *it);
+	}
+	points.erase(end, points.end());
+	return points;
+}

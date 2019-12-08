@@ -22,12 +22,12 @@ public:
 	bool Open();
 	/// run app
 	void Run();
-private:
 
 	GLuint program;
 	GLuint vertexShader;
 	GLuint pixelShader;
 	GLuint triangle;
+	GLuint ibo;
 	Display::Window* window;
 };
 } // namespace Example

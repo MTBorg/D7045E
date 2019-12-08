@@ -74,4 +74,6 @@ inline bool pointInsideTriangle(
 // ci->c and cm->c
 bool pointInSector(const glvec& point, const glvec& c, const glvec& ci, const glvec& cm);
 
+
+std::vector<glvec> removeDuplicates(std::vector<glvec> points);
 #endif
