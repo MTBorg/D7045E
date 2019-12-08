@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <math.h>
 #include <glm/glm.hpp>   
+#include <iostream>
 
 #include "types.h"
 #include "node.h"
@@ -50,6 +51,24 @@ inline bool pointOnLine(
 }
 
 int pickPointNotOnConvexHull(const std::vector<glvec>& points, const std::vector<glvec>& hull);
+
+inline bool pointInsideTriangle(
+		const glvec& point,
+		const glvec& a,
+		const glvec& b,
+		const glvec& c){
+	return 
+		(
+			pointLeftOfLine(a,b, point) &&
+			pointLeftOfLine(b,c,point) && 
+			pointLeftOfLine(c,a, point)
+		) ||
+		(
+			!pointLeftOfLine(a,b, point) &&
+			!pointLeftOfLine(b,c,point) && 
+			!pointLeftOfLine(c,a, point)
+		);
+}
 
 // Check if a point is in sector between the clockwise sector beetween the lines
 // ci->c and cm->c

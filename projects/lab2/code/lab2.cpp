@@ -25,9 +25,12 @@ const GLchar* vs =
 "#version 310 es\n"
 "precision mediump float;\n"
 "layout(location=0) in vec2 pos;\n"
+"layout(location=1) in vec4 color;\n"
+"layout(location=0) out vec4 Color;\n"
 "void main()\n"
 "{\n"
 "	gl_Position = vec4(pos, -1, 1);\n"
+" Color = color;\n"
 "}\n";
 
 const GLchar* ps =
@@ -37,11 +40,19 @@ const GLchar* ps =
 "out vec4 Color;\n"
 "void main()\n"
 "{\n"
-"	Color = vec4(1, 0,0,0);\n"
+"	Color = color;\n"
 "}\n";
 
 using namespace Display;
 
+#define TREE_OUTLINE_COLOR 1.f,0,0,1.f
+#define TREE_FILL_COLOR 1.f,1.f,1.f,1.f
+#define VERTEX_COLOR 0,0,1.f,1.f
+#define BACKGROUND_COLOR 0,0,0,1.f
+
+	int redIndex = 0;
+	int greenIndex = 1;
+int blueIndex = 2;
 
 std::vector<glvec> vertices;
 std::vector<glvec> hull;
@@ -88,6 +99,34 @@ std::vector<glvec> generateRandomPoints(size_t size){
 	return res;
 }
 
+glm::vec4 interpolateColor(const glvec& point){
+	float32
+		redDist =  glm::distance(point, vertices[redIndex]),
+		greenDist =  glm::distance(point, vertices[greenIndex]),
+		blueDist =  glm::distance(point, vertices[blueIndex]);
+
+	float32 alpha = 1;
+	// If outside the triangled spanned by the three color points
+	if(!pointInsideTriangle(
+			point, vertices[redIndex], vertices[greenIndex], vertices[blueIndex])
+			&& point != vertices[redIndex]
+			&& point != vertices[greenIndex]
+			&& point != vertices[blueIndex]
+		){
+		float minDist = 10; //Distance can never be greater than sqrt(8)
+		for(const auto& hullPoint: hull){
+			float dist = glm::distance(point, hullPoint);
+			if(dist < minDist) minDist = dist;
+		}
+		// This would make wore sense if it would be minDist / sqrt(8) but that makes
+		// it really difficult to see the vertices
+		alpha = minDist;
+	}
+
+	// Divide the distance with sqrt(9) because that's the maximum distance
+	return glm::vec4(redDist/sqrt(8), greenDist/sqrt(8), blueDist/sqrt(8), alpha);
+}
+
 namespace Example{
 
 ExampleApp::ExampleApp(){} 
@@ -98,13 +137,13 @@ bool ExampleApp::Open(){
 
 	printf("generating points...\n");
 	do{
-		vertices = generateRandomPoints(25);
+		vertices = generateRandomPoints(20);
 		hull = convexHull(vertices);
 	}while(
 			!validation::originIsInConvexHull(hull) ||
 			validation::duplicatePoints(vertices)
 	);
-	/* vertices = readFile("pointsets/bug_case_9.txt"); */
+	/* vertices = readFile("pointsets/square.txt"); */
 	/* 	hull = convexHull(vertices); */
 
 	
@@ -140,7 +179,7 @@ bool ExampleApp::Open(){
 	if (this->window->Open())
 	{
 		// set clear color to gray
-		glClearColor(0.4f, 0.4f, 0.f, 7.0f);
+		glClearColor(BACKGROUND_COLOR);
 
 		// setup vertex shader
 		this->vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -195,8 +234,12 @@ bool ExampleApp::Open(){
 		glGenBuffers(1, &this->triangle);
 		glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
 		glUseProgram(this->program);
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2) + sizeof(glm::vec4), NULL);
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), NULL);
+		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec2) + sizeof(glm::vec4), (GLvoid*)sizeof(glm::vec2));
+		glEnableVertexAttribArray(1);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_BLEND);
 
 		return true;
 	}
@@ -212,25 +255,55 @@ ExampleApp::Run()
 		this->window->Update();
 
 		// Draw tree
-		for(auto it = tree.begin(); it != tree.end() - 3; it+=3){
-			glvec buf[] = {*it, *(it+1), *(it+2)};
+		for(auto it = tree.begin(); it <= tree.end() - 3; it+=3){
+			auto v1 = it, v2 = it+1, v3 = it+2;
+			//Fill the triangles
 			glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
+			GLfloat triBuf[] = {
+				v1->x, v1->y, TREE_FILL_COLOR,
+				v2->x, v2->y, TREE_FILL_COLOR,
+				v3->x, v3->y, TREE_FILL_COLOR
+			};
+			glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(glm::vec2) + 3 * sizeof(glm::vec4), &triBuf[0], GL_DYNAMIC_DRAW);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
+
+			// Draw the outline of the triangles
 			glLineWidth(1);
-			glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(glm::vec2), &buf[0], GL_DYNAMIC_DRAW);
+			GLfloat buf[] = {
+				v1->x, v1->y, TREE_OUTLINE_COLOR,
+				v2->x, v2->y, TREE_OUTLINE_COLOR,
+				v3->x, v3->y, TREE_OUTLINE_COLOR
+			};
+			glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(glm::vec2) + 3 * sizeof(glm::vec4), &buf[0], GL_DYNAMIC_DRAW);
 			glDrawArrays(GL_LINE_LOOP, 0, 3);
 		}
 
 		// Draw hull
-		glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
-		glLineWidth(5);
-		glBufferData(GL_ARRAY_BUFFER, hull.size() * sizeof(glm::vec2), &hull[0], GL_DYNAMIC_DRAW);
-		glDrawArrays(GL_LINE_LOOP, 0, hull.size());
+		/* glBindBuffer(GL_ARRAY_BUFFER, this->triangle); */
+		/* glLineWidth(5); */
+		/* glBufferData(GL_ARRAY_BUFFER, hull.size() * sizeof(glm::vec2), &hull[0], GL_DYNAMIC_DRAW); */
+		/* glDrawArrays(GL_LINE_LOOP, 0, hull.size()); */
 		
 		// Draw vertices
-		glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
-		glPointSize(10);
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec2), &vertices[0], GL_DYNAMIC_DRAW);
-		glDrawArrays(GL_POINTS, 0, vertices.size());
+		for(auto it = vertices.begin(); it != vertices.end(); ++it){
+			glm::vec4 color = glm::vec4(VERTEX_COLOR);
+			if(*it == vertices[redIndex]){
+				color = glm::vec4(1.f,0,0,1.f);
+			}else if(*it == vertices[greenIndex]){
+				color = glm::vec4(0,1.f,0,1.f);
+			}else if(*it == vertices[blueIndex]){
+				color = glm::vec4(0,0,1.f,1.f);
+			}else{
+				color = interpolateColor(*it);
+			}
+			GLfloat buf[] = {
+				it->x, it->y, color.r, color.g, color.b, color.a
+			};
+			glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
+			glPointSize(15);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) + sizeof(glm::vec4), &buf[0], GL_DYNAMIC_DRAW);
+			glDrawArrays(GL_POINTS, 0, 1);
+		}
 
 		this->window->SwapBuffers();
 	}
