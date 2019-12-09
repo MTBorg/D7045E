@@ -16,6 +16,8 @@ public:
 	/// destructor
 	~Lab2App();
 
+	void updateVertexBuffer();
+
 	/// open app
 	bool Open();
 	/// run app

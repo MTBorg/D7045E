@@ -142,8 +142,6 @@ glm::vec4 colorVertex(const glvec& vertex){
 	return color;
 }
 
-
-
 /*
  * Creates a buffer containing triplets of indices corresponding to the corners of 
  * a triangle given lists of triangles and unique vertices.
@@ -225,11 +223,7 @@ std::vector<IndexTriangle> createTreeIndexBuffer(
 	return res;
 }
 
-Lab2App::Lab2App(){} 
-Lab2App::~Lab2App(){} 
-
-bool Lab2App::Open(){
-	printf("generating points...\n");
+void generateRandomTriangulationSet(){
 	do{
 		vertices = generateRandomPoints(10);
 		hull = convexHull(vertices);
@@ -239,7 +233,6 @@ bool Lab2App::Open(){
 	);
 	/* vertices = readFile("pointsets/square.txt"); */
 	/* 	hull = convexHull(vertices); */
-
 	
 	// Create new hull with the first element appended as the last
 	auto hullTemp = hull;
@@ -258,14 +251,57 @@ bool Lab2App::Open(){
 		}
 	}
 	tree = root->toPointVec();
+}
+
+Lab2App::Lab2App(){} 
+Lab2App::~Lab2App(){} 
+
+void Lab2App::updateVertexBuffer(){
+		// do stuff
+		// setup vbo
+		glGenBuffers(1, &this->triangle);
+		glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
+		glUseProgram(this->program);
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2) + sizeof(glm::vec4), NULL);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(1,
+			4,
+			GL_FLOAT,
+			GL_FALSE,
+			sizeof(glm::vec2) + sizeof(glm::vec4),
+			(GLvoid*)sizeof(glm::vec2)
+		);
+		glEnableVertexAttribArray(1);
+		vertexBuffer = createVertexBuffer(vertices);
+		glBufferData(
+				GL_ARRAY_BUFFER,
+				vertexBuffer.size() * sizeof(GLfloat),
+				&vertexBuffer[0],
+				GL_DYNAMIC_DRAW
+		);
+
+		// Compute the index buffers
+		const unsigned int bufferStride = 6;
+		hullIndices = createHullIndexBuffer(hull, vertexBuffer, bufferStride);
+		vertexIndices = createVertexIndexBuffer(vertices, vertexBuffer, bufferStride);
+		treeIndices = createTreeIndexBuffer(tree, vertexBuffer, bufferStride);
+}
+
+bool Lab2App::Open(){
+	printf("generating points...\n");
+
+	generateRandomTriangulationSet();
 
 	App::Open();
 	this->window = new Display::Window;
 	this->window->SetSize(500,500);
-	window->SetKeyPressFunction([this](int32 keyCode, int32, int32, int32)
+	window->SetKeyPressFunction([this](int32 keyCode, int32, int32 action, int32)
 	{
-		static int lastKey = -1;
-		if(keyCode == 256){ //Esc
+		if(keyCode == GLFW_KEY_R && action == GLFW_RELEASE){
+			printf("Generating new points\n");
+			generateRandomTriangulationSet();
+			updateVertexBuffer();
+		}else if(keyCode == 256){ //Esc
 			this->window->Close();
 		}
 	});
@@ -323,34 +359,8 @@ bool Lab2App::Open(){
 			delete[] buf;
 		}
 
+		updateVertexBuffer();
 
-		// do stuff
-		// setup vbo
-		glGenBuffers(1, &this->triangle);
-		glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
-		glUseProgram(this->program);
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2) + sizeof(glm::vec4), NULL);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1,
-			4,
-			GL_FLOAT,
-			GL_FALSE,
-			sizeof(glm::vec2) + sizeof(glm::vec4),
-			(GLvoid*)sizeof(glm::vec2)
-		);
-		glEnableVertexAttribArray(1);
-		vertexBuffer = createVertexBuffer(vertices);
-		glBufferData(
-				GL_ARRAY_BUFFER,
-				vertexBuffer.size() * sizeof(GLfloat),
-				&vertexBuffer[0],
-				GL_DYNAMIC_DRAW
-		);
-
-		// Compute the index buffers
-		hullIndices = createHullIndexBuffer(hull, vertexBuffer, 6);
-		vertexIndices = createVertexIndexBuffer(vertices, vertexBuffer, 6);
-		treeIndices = createTreeIndexBuffer(tree, vertexBuffer, 6);
 
 		// Enable alpha channel
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
