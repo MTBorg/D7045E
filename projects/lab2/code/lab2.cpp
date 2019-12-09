@@ -27,9 +27,12 @@ const GLchar* vs =
 "layout(location=0) in vec2 pos;\n"
 "layout(location=1) in vec4 color;\n"
 "layout(location=0) out vec4 Color;\n"
+"uniform float angle;\n"
 "void main()\n"
 "{\n"
-"	gl_Position = vec4(pos, -1, 1);\n"
+" float x = pos[0] + cos(angle) / 4.f;\n"
+" float y = pos[1] + sin(angle) / 4.f;\n"
+"	gl_Position = vec4(x, y, -1, 1);\n"
 " Color = color;\n"
 "}\n";
 
@@ -54,8 +57,8 @@ struct IndexTriangle{
 	unsigned long int i1, i2, i3;
 };
 
-	int redIndex = 0;
-	int greenIndex = 1;
+int redIndex = 0;
+int greenIndex = 1;
 int blueIndex = 2;
 
 std::vector<glvec> vertices;
@@ -311,24 +314,37 @@ bool ExampleApp::Open(){
 		);
 		glEnableVertexAttribArray(1);
 		auto vertexBuffer = createVertexBuffer(vertices);
-		for(const auto& test: vertexBuffer){
-			printf("test: %f\n", test);
-		}
+		/* for(const auto& test: vertexBuffer){ */
+		/* 	printf("test: %f\n", test); */
+		/* } */
 		vertexBuffer = std::vector<GLfloat>({
-				-0.5, 0, 1.f, 0,0,1,
-				0, 0.5, 1.f,0,0,1,
-				0.5, 0, 1.f,0,0,1
+				-0.5f, -0.5f, 1.f, 0,0,1.f,
+				-0.5f, 0.5f, 1.f,0,0,1.f,
+				0.5f, 0.5f, 1.f,0,0,1.f,
+				0.5f, -0.5f, 1.f,0,0,1.f
 				});
 		glBufferData(
 				GL_ARRAY_BUFFER,
-				sizeof(vertexBuffer),
+				sizeof(vertexBuffer) * sizeof(GLfloat),
 				&vertexBuffer[0],
 				GL_DYNAMIC_DRAW
 		);
-		//
+
+		unsigned int buf[] = {
+			0,1,2,
+			0,2,3
+		};
+		GLuint ibo;
 		// setup index buffer
-		glGenBuffers(1, &this->ibo);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibo);
+		glGenBuffers(1, &ibo);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+		glBufferData(
+				GL_ELEMENT_ARRAY_BUFFER,
+				6 * sizeof(unsigned int),
+				&buf[0],
+				GL_DYNAMIC_DRAW
+				);
+
 
 		// Enable alpha channel
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -347,24 +363,35 @@ ExampleApp::Run()
 		glClear(GL_COLOR_BUFFER_BIT);
 		this->window->Update();
 
-		for(const auto& triangle: indexTree){
-			//Fill the triangles
-			/* glBindBuffer(GL_ARRAY_BUFFER, this->triangle); */
-			unsigned int buf[] = {
-				0, 1, 2
-			};
-			/* unsigned int buf[] = { */
-			/* 	triangle.i1, triangle.i2, triangle.i3 */
-			/* }; */
-			/* printf("i1: %d, i2: %d, i3: %d\n", triangle.i1, triangle.i2, triangle.i3); */
-			glBufferData(
-				GL_ELEMENT_ARRAY_BUFFER,
-				3 * sizeof(unsigned int),
-				&buf[0],
-				GL_DYNAMIC_DRAW
-			);
-			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
+		
+		static float angle = 0;
+		angle += 0.03f;
+		GLint angleUniform = glGetUniformLocation(this->program, "angle");
+		if(angleUniform != -1){
+			glUniform1f(angleUniform, angle);
+		}else{
+			printf("Failed to set uniform angle\n");
 		}
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+
+		/* for(const auto& triangle: indexTree){ */
+		/* 	//Fill the triangles */
+		/* 	/1* glBindBuffer(GL_ARRAY_BUFFER, this->triangle); *1/ */
+		/* 	unsigned int buf[] = { */
+		/* 		0, 1, 2 */
+		/* 	}; */
+		/* 	/1* unsigned int buf[] = { *1/ */
+		/* 	/1* 	triangle.i1, triangle.i2, triangle.i3 *1/ */
+		/* 	/1* }; *1/ */
+		/* 	/1* printf("i1: %d, i2: %d, i3: %d\n", triangle.i1, triangle.i2, triangle.i3); *1/ */
+		/* 	glBufferData( */
+		/* 		GL_ELEMENT_ARRAY_BUFFER, */
+		/* 		3 * sizeof(unsigned int), */
+		/* 		&buf[0], */
+		/* 		GL_DYNAMIC_DRAW */
+		/* 	); */
+		/* 	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr); */
+		/* } */
 		// Draw tree
 		/* for(auto it = tree.begin(); it <= tree.end() - 3; it+=3){ */
 		/* 	auto v1 = it, v2 = it+1, v3 = it+2; */
