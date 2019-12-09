@@ -223,17 +223,7 @@ std::vector<IndexTriangle> createTreeIndexBuffer(
 	return res;
 }
 
-void generateRandomTriangulationSet(const unsigned int size){
-	do{
-		vertices = generateRandomPoints(size);
-		hull = convexHull(vertices);
-	}while(
-			!validation::originIsInConvexHull(hull) ||
-			validation::duplicatePoints(vertices)
-	);
-	/* vertices = readFile("pointsets/square.txt"); */
-	/* 	hull = convexHull(vertices); */
-	
+void calculateTriangulation(){
 	// Create new hull with the first element appended as the last
 	auto hullTemp = hull;
 	hullTemp.push_back(hullTemp[0]);
@@ -251,6 +241,18 @@ void generateRandomTriangulationSet(const unsigned int size){
 		}
 	}
 	tree = root->toPointVec();
+}
+
+void generateRandomTriangulationSet(const unsigned int size){
+	do{
+		vertices = generateRandomPoints(size);
+		hull = convexHull(vertices);
+	}while(
+			!validation::originIsInConvexHull(hull) ||
+			validation::duplicatePoints(vertices)
+	);
+	
+	calculateTriangulation();
 }
 
 Lab2App::Lab2App(){} 
@@ -292,7 +294,7 @@ void Lab2App::handleKeyPress(int32 keyCode, int32 action){
 	static unsigned int randomSum = 0;
 	static unsigned int inputCount = 0;
 	if(action == GLFW_RELEASE){
-		if(keyCode == GLFW_KEY_R){
+		if(keyCode == GLFW_KEY_R && !insertMode){
 			printf("Enter the number of point to generate:\n");
 			insertMode = true;
 		}else if(keyCode == GLFW_KEY_ENTER && insertMode){
@@ -308,6 +310,12 @@ void Lab2App::handleKeyPress(int32 keyCode, int32 action){
 			randomSum *= 10;
 			randomSum += (keyCode - GLFW_KEY_0);
 			inputCount++;
+		}else if(keyCode == GLFW_KEY_F){
+			printf("Reading file\n");
+			vertices = readFile("input.txt");
+			hull = convexHull(vertices);
+			calculateTriangulation();
+			updateVertexBuffer();
 		}else if(keyCode == 256){ //Esc
 			this->window->Close();
 		}else if(insertMode){
