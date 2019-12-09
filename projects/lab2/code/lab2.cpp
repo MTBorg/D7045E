@@ -30,8 +30,9 @@ const GLchar* vs =
 "uniform float angle;\n"
 "void main()\n"
 "{\n"
-" float x = pos[0] + cos(angle) / 4.f;\n"
-" float y = pos[1] + sin(angle) / 4.f;\n"
+" float offset = 10.f * float(gl_VertexID);\n"
+" float x = pos[0] + 0.05f * cos(angle + offset) / 4.f;\n"
+" float y = pos[1] + 0.05f * sin(angle + offset) / 4.f;\n"
 "	gl_Position = vec4(x, y, -1, 1);\n"
 " Color = color;\n"
 "}\n";
@@ -51,7 +52,8 @@ using namespace Display;
 #define TREE_OUTLINE_COLOR 1.f,0,0,1.f
 #define TREE_FILL_COLOR 1.f,1.f,1.f,1.f
 #define VERTEX_COLOR 0,0,1.f,1.f
-#define BACKGROUND_COLOR 0,0,0,1.f
+#define BACKGROUND_COLOR 1.f,1.f,1.f,1.f
+#define ROTATION_SPEED 0.01f
 
 struct IndexTriangle{
 	unsigned long int i1, i2, i3;
@@ -66,6 +68,10 @@ std::vector<glvec> hull;
 int cIndex = -1;
 std::vector<glvec> tree;
 std::vector<IndexTriangle> indexTree;
+std::vector<unsigned int> hullIndices;
+std::vector<unsigned int> vertexIndices;
+std::vector<IndexTriangle> treeIndices;
+std::vector<GLfloat> vertexBuffer;
 
 std::vector<glvec> readFile(std::string file){
 	std::vector<glvec> result;
@@ -184,11 +190,53 @@ std::vector<GLfloat> createVertexBuffer(std::vector<glvec> vertices){
 		res.push_back(color.r);
 		res.push_back(color.g);
 		res.push_back(color.b);
-		res.push_back(color.a);
+		/* res.push_back(color.a); */
+		res.push_back(1.f);
 	}
 	return res;
 }
 
+std::vector<unsigned int> createHullIndexBuffer(
+		const std::vector<glvec>& hull,
+		const std::vector<GLfloat>& vertexBuffer,
+		unsigned long bufferStride){
+	auto res = std::vector<unsigned int>();
+	for(const auto& vertex: hull){
+		res.push_back(
+			getVertexIndexFromVertexBuffer(vertex, vertexBuffer, bufferStride)
+		);
+	}
+	return res;
+}
+
+std::vector<unsigned int> createVertexIndexBuffer(
+		const std::vector<glvec>& vertices,
+		const std::vector<GLfloat>& vertexBuffer,
+		const unsigned int bufferStride){
+	auto res = std::vector<unsigned int>();
+	for(const auto& vertex: vertices){
+		res.push_back(
+			getVertexIndexFromVertexBuffer(vertex, vertexBuffer, bufferStride)
+		);
+	}
+	return res;
+}
+
+std::vector<IndexTriangle> createTreeIndexBuffer(
+		const std::vector<glvec>& treeVertices,
+		const std::vector<GLfloat>& vertexBuffer,
+		const unsigned int bufferStride
+	){
+	auto res = std::vector<IndexTriangle>();
+	for(auto it = treeVertices.begin(); it <= treeVertices.end() - 3; it+=3){
+		IndexTriangle t;
+		t.i1 = getVertexIndexFromVertexBuffer(*it, vertexBuffer, bufferStride);
+		t.i2 = getVertexIndexFromVertexBuffer(*(it+1), vertexBuffer, bufferStride);
+		t.i3 = getVertexIndexFromVertexBuffer(*(it+2), vertexBuffer, bufferStride);
+		res.push_back(t);
+	}
+	return res;
+}
 
 namespace Example{
 
@@ -196,11 +244,9 @@ ExampleApp::ExampleApp(){}
 ExampleApp::~ExampleApp(){} 
 
 bool ExampleApp::Open(){
-	/* vertices = readFile("pointsets/square_tree_insert_1.txt"); */
-
 	printf("generating points...\n");
 	do{
-		vertices = generateRandomPoints(20);
+		vertices = generateRandomPoints(10);
 		hull = convexHull(vertices);
 	}while(
 			!validation::originIsInConvexHull(hull) ||
@@ -227,11 +273,6 @@ bool ExampleApp::Open(){
 		}
 	}
 	tree = root->toPointVec();
-	indexTree = createTriangleIndexBuffer(tree, removeDuplicates(tree));
-	tree = removeDuplicates(tree);
-	/* for(const auto& test: indexTree){ */
-	/* 	printf("i1: %d, i2: %d, i3: %d\n", test.i1, test.i2, test.i3); */
-	/* } */
 
 	App::Open();
 	this->window = new Display::Window;
@@ -313,38 +354,18 @@ bool ExampleApp::Open(){
 			(GLvoid*)sizeof(glm::vec2)
 		);
 		glEnableVertexAttribArray(1);
-		auto vertexBuffer = createVertexBuffer(vertices);
-		/* for(const auto& test: vertexBuffer){ */
-		/* 	printf("test: %f\n", test); */
-		/* } */
-		vertexBuffer = std::vector<GLfloat>({
-				-0.5f, -0.5f, 1.f, 0,0,1.f,
-				-0.5f, 0.5f, 1.f,0,0,1.f,
-				0.5f, 0.5f, 1.f,0,0,1.f,
-				0.5f, -0.5f, 1.f,0,0,1.f
-				});
+		vertexBuffer = createVertexBuffer(vertices);
 		glBufferData(
 				GL_ARRAY_BUFFER,
-				sizeof(vertexBuffer) * sizeof(GLfloat),
+				vertexBuffer.size() * sizeof(GLfloat),
 				&vertexBuffer[0],
 				GL_DYNAMIC_DRAW
 		);
 
-		unsigned int buf[] = {
-			0,1,2,
-			0,2,3
-		};
-		GLuint ibo;
-		// setup index buffer
-		glGenBuffers(1, &ibo);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-		glBufferData(
-				GL_ELEMENT_ARRAY_BUFFER,
-				6 * sizeof(unsigned int),
-				&buf[0],
-				GL_DYNAMIC_DRAW
-				);
-
+		// Compute the index buffers
+		hullIndices = createHullIndexBuffer(hull, vertexBuffer, 6);
+		vertexIndices = createVertexIndexBuffer(vertices, vertexBuffer, 6);
+		treeIndices = createTreeIndexBuffer(tree, vertexBuffer, 6);
 
 		// Enable alpha channel
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -363,86 +384,55 @@ ExampleApp::Run()
 		glClear(GL_COLOR_BUFFER_BIT);
 		this->window->Update();
 
-		
+		//Draw hull
+		GLuint ibo;
+		// setup index buffer
+		glGenBuffers(1, &ibo);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+		glBufferData(
+				GL_ELEMENT_ARRAY_BUFFER,
+				hullIndices.size() * sizeof(unsigned int),
+				&hullIndices[0],
+				GL_DYNAMIC_DRAW
+				);
+		glDrawElements(GL_LINE_LOOP, hullIndices.size(), GL_UNSIGNED_INT, nullptr);
+
+		//Draw vertices
+		// setup index buffer
+		glGenBuffers(1, &ibo);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+		glPointSize(10);
+		glBufferData(
+				GL_ELEMENT_ARRAY_BUFFER,
+				vertexIndices.size() * sizeof(unsigned int),
+				&vertexIndices[0],
+				GL_DYNAMIC_DRAW
+				);
+		glDrawElements(GL_POINTS, vertexIndices.size(), GL_UNSIGNED_INT, nullptr);
+
 		static float angle = 0;
-		angle += 0.03f;
+		angle += ROTATION_SPEED;
+
 		GLint angleUniform = glGetUniformLocation(this->program, "angle");
-		if(angleUniform != -1){
+		if(angleUniform != 1){
 			glUniform1f(angleUniform, angle);
 		}else{
-			printf("Failed to set uniform angle\n");
+			printf("Failed, to locate uniform angle\n");
 		}
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
-		/* for(const auto& triangle: indexTree){ */
-		/* 	//Fill the triangles */
-		/* 	/1* glBindBuffer(GL_ARRAY_BUFFER, this->triangle); *1/ */
-		/* 	unsigned int buf[] = { */
-		/* 		0, 1, 2 */
-		/* 	}; */
-		/* 	/1* unsigned int buf[] = { *1/ */
-		/* 	/1* 	triangle.i1, triangle.i2, triangle.i3 *1/ */
-		/* 	/1* }; *1/ */
-		/* 	/1* printf("i1: %d, i2: %d, i3: %d\n", triangle.i1, triangle.i2, triangle.i3); *1/ */
-		/* 	glBufferData( */
-		/* 		GL_ELEMENT_ARRAY_BUFFER, */
-		/* 		3 * sizeof(unsigned int), */
-		/* 		&buf[0], */
-		/* 		GL_DYNAMIC_DRAW */
-		/* 	); */
-		/* 	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr); */
-		/* } */
-		// Draw tree
-		/* for(auto it = tree.begin(); it <= tree.end() - 3; it+=3){ */
-		/* 	auto v1 = it, v2 = it+1, v3 = it+2; */
-		/* 	//Fill the triangles */
-		/* 	/1* glBindBuffer(GL_ARRAY_BUFFER, this->triangle); *1/ */
-		/* 	GLfloat triBuf[] = { */
-		/* 		v1->x, v1->y, TREE_FILL_COLOR, */
-		/* 		v2->x, v2->y, TREE_FILL_COLOR, */
-		/* 		v3->x, v3->y, TREE_FILL_COLOR */
-		/* 	}; */
-		/* 	glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(glm::vec2) + 3 * sizeof(glm::vec4), &triBuf[0], GL_DYNAMIC_DRAW); */
-		/* 	glDrawElements(GL_TRIANGLES, 3, 3); */
-
-		/* 	// Draw the outline of the triangles */
-		/* 	/1* glLineWidth(1); *1/ */
-		/* 	/1* GLfloat buf[] = { *1/ */
-		/* 	/1* 	v1->x, v1->y, TREE_OUTLINE_COLOR, *1/ */
-		/* 	/1* 	v2->x, v2->y, TREE_OUTLINE_COLOR, *1/ */
-		/* 	/1* 	v3->x, v3->y, TREE_OUTLINE_COLOR *1/ */
-		/* 	/1* }; *1/ */
-		/* 	/1* glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(glm::vec2) + 3 * sizeof(glm::vec4), &buf[0], GL_DYNAMIC_DRAW); *1/ */
-		/* 	/1* glDrawArrays(GL_LINE_LOOP, 0, 3); *1/ */
-		/* } */
-
-		// Draw hull
-		/* glBindBuffer(GL_ARRAY_BUFFER, this->triangle); */
-		/* glLineWidth(5); */
-		/* glBufferData(GL_ARRAY_BUFFER, hull.size() * sizeof(glm::vec2), &hull[0], GL_DYNAMIC_DRAW); */
-		/* glDrawArrays(GL_LINE_LOOP, 0, hull.size()); */
-		
-		// Draw vertices
-		/* for(auto it = vertices.begin(); it != vertices.end(); ++it){ */
-		/* 	glm::vec4 color = glm::vec4(VERTEX_COLOR); */
-		/* 	if(*it == vertices[redIndex]){ */
-		/* 		color = glm::vec4(1.f,0,0,1.f); */
-		/* 	}else if(*it == vertices[greenIndex]){ */
-		/* 		color = glm::vec4(0,1.f,0,1.f); */
-		/* 	}else if(*it == vertices[blueIndex]){ */
-		/* 		color = glm::vec4(0,0,1.f,1.f); */
-		/* 	}else{ */
-		/* 		color = interpolateColor(*it); */
-		/* 	} */
-		/* 	GLfloat buf[] = { */
-		/* 		it->x, it->y, color.r, color.g, color.b, color.a */
-		/* 	}; */
-		/* 	glBindBuffer(GL_ARRAY_BUFFER, this->triangle); */
-		/* 	glPointSize(15); */
-		/* 	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) + sizeof(glm::vec4), &buf[0], GL_DYNAMIC_DRAW); */
-		/* 	glDrawArrays(GL_POINTS, 0, 1); */
-		/* } */
-
+		//Draw tree
+		for(const auto& triangle: treeIndices){
+			unsigned int buf[] = {triangle.i1, triangle.i2, triangle.i3};
+			glGenBuffers(1, &ibo);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+			glBufferData(
+					GL_ELEMENT_ARRAY_BUFFER,
+					3 * sizeof(unsigned int),
+					&buf[0],
+					GL_DYNAMIC_DRAW
+					);
+			glDrawElements(GL_LINE_LOOP, 3, GL_UNSIGNED_INT, nullptr);
+		}
 		this->window->SwapBuffers();
 	}
 }

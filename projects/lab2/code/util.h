@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <math.h>
 #include <glm/glm.hpp>   
+#include <GL/gl.h>
 #include <iostream>
 
 #include "types.h"
@@ -76,4 +77,9 @@ bool pointInSector(const glvec& point, const glvec& c, const glvec& ci, const gl
 
 
 std::vector<glvec> removeDuplicates(std::vector<glvec> points);
+
+unsigned int getVertexIndexFromVertexBuffer(
+		const glvec& vertex,
+		const std::vector<GLfloat> vertexBuffer,
+		const unsigned int bufferStride);
 #endif

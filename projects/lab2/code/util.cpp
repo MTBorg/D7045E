@@ -3,6 +3,7 @@
 #include "types.h"
 
 #include <iostream>
+#include <glm/glm.hpp>
 
 int pickPointNotOnConvexHull(const std::vector<glvec>& points, const std::vector<glvec>& hull){
 	for(auto it = points.begin(); it != points.end(); ++it){
@@ -28,4 +29,19 @@ std::vector<glvec> removeDuplicates(std::vector<glvec> points){
 	}
 	points.erase(end, points.end());
 	return points;
+}
+
+unsigned int getVertexIndexFromVertexBuffer(
+		const glvec& vertex,
+		const std::vector<GLfloat> vertexBuffer,
+		const unsigned int bufferStride){
+		for(
+				auto it = vertexBuffer.begin();
+				it <= vertexBuffer.end() - bufferStride;
+				it+=bufferStride
+			){
+			if(*it == vertex.x && *(it+1) == vertex.y){
+				return ((it - vertexBuffer.begin()) / bufferStride);
+			}
+		}
 }
