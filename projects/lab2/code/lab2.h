@@ -8,15 +8,13 @@
 //------------------------------------------------------------------------------
 #include "core/app.h"
 #include "render/window.h"
-namespace Example
-{
-class ExampleApp : public Core::App
+class Lab2App : public Core::App
 {
 public:
 	/// constructor
-	ExampleApp();
+	Lab2App();
 	/// destructor
-	~ExampleApp();
+	~Lab2App();
 
 	/// open app
 	bool Open();
@@ -30,4 +28,3 @@ public:
 	GLuint ibo;
 	Display::Window* window;
 };
-} // namespace Example

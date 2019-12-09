@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// exampleapp.cc
+// lab2.cpp
 // (C) 2015-2017 Individual contributors, see AUTHORS file
 //------------------------------------------------------------------------------
 #include "config.h"
@@ -238,12 +238,10 @@ std::vector<IndexTriangle> createTreeIndexBuffer(
 	return res;
 }
 
-namespace Example{
+Lab2App::Lab2App(){} 
+Lab2App::~Lab2App(){} 
 
-ExampleApp::ExampleApp(){} 
-ExampleApp::~ExampleApp(){} 
-
-bool ExampleApp::Open(){
+bool Lab2App::Open(){
 	printf("generating points...\n");
 	do{
 		vertices = generateRandomPoints(10);
@@ -376,9 +374,7 @@ bool ExampleApp::Open(){
 	return false;
 }
 
-void
-ExampleApp::Run()
-{
+void Lab2App::Run(){
 	while (this->window->IsOpen())
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -435,5 +431,4 @@ ExampleApp::Run()
 		}
 		this->window->SwapBuffers();
 	}
-}
 }
