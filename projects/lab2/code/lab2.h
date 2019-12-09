@@ -17,6 +17,7 @@ public:
 	~Lab2App();
 
 	void updateVertexBuffer();
+	void handleKeyPress(int32 keyCode, int32 action);
 
 	/// open app
 	bool Open();

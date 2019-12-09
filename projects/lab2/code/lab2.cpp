@@ -223,9 +223,9 @@ std::vector<IndexTriangle> createTreeIndexBuffer(
 	return res;
 }
 
-void generateRandomTriangulationSet(){
+void generateRandomTriangulationSet(const unsigned int size){
 	do{
-		vertices = generateRandomPoints(10);
+		vertices = generateRandomPoints(size);
 		hull = convexHull(vertices);
 	}while(
 			!validation::originIsInConvexHull(hull) ||
@@ -287,23 +287,46 @@ void Lab2App::updateVertexBuffer(){
 		treeIndices = createTreeIndexBuffer(tree, vertexBuffer, bufferStride);
 }
 
+void Lab2App::handleKeyPress(int32 keyCode, int32 action){
+	static bool insertMode = false;
+	static unsigned int randomSum = 0;
+	static unsigned int inputCount = 0;
+	if(action == GLFW_RELEASE){
+		if(keyCode == GLFW_KEY_R){
+			printf("Enter the number of point to generate:\n");
+			insertMode = true;
+		}else if(keyCode == GLFW_KEY_ENTER && insertMode){
+			insertMode = false;
+			if(randomSum <= 3){
+				printf("Please enter a number bigger than 3\n");
+			}else{
+				generateRandomTriangulationSet(randomSum);
+				updateVertexBuffer();
+			}
+			randomSum = inputCount = 0;
+		}else if(keyCode >= GLFW_KEY_0 && keyCode <= GLFW_KEY_9 && insertMode){
+			randomSum *= 10;
+			randomSum += (keyCode - GLFW_KEY_0);
+			inputCount++;
+		}else if(keyCode == 256){ //Esc
+			this->window->Close();
+		}else if(insertMode){
+			printf("Please enter numbers\n");
+		}
+	}
+}
+
 bool Lab2App::Open(){
 	printf("generating points...\n");
 
-	generateRandomTriangulationSet();
+	generateRandomTriangulationSet(5);
 
 	App::Open();
 	this->window = new Display::Window;
 	this->window->SetSize(500,500);
 	window->SetKeyPressFunction([this](int32 keyCode, int32, int32 action, int32)
 	{
-		if(keyCode == GLFW_KEY_R && action == GLFW_RELEASE){
-			printf("Generating new points\n");
-			generateRandomTriangulationSet();
-			updateVertexBuffer();
-		}else if(keyCode == 256){ //Esc
-			this->window->Close();
-		}
+		handleKeyPress(keyCode, action);
 	});
 
 	if (this->window->Open())
