@@ -82,4 +82,7 @@ unsigned int getVertexIndexFromVertexBuffer(
 		const glvec& vertex,
 		const std::vector<GLfloat> vertexBuffer,
 		const unsigned int bufferStride);
+
+std::vector<glvec> generateRandomPoints(size_t size);
+
 #endif

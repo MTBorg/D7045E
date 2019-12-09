@@ -45,3 +45,16 @@ unsigned int getVertexIndexFromVertexBuffer(
 			}
 		}
 }
+
+std::vector<glvec> generateRandomPoints(size_t size){
+	auto res = std::vector<glvec>();
+	srand(time(NULL));
+	for(size_t i = 0; i < size; i++){
+		int xSign = (rand() % 2) ? -1 : 1;
+		int ySign = (rand() % 2) ? -1 : 1;
+		res.emplace_back(
+				xSign * (rand() % 10 / 10.f),
+				ySign * (rand() % 10 / 10.f));
+	}
+	return res;
+}
