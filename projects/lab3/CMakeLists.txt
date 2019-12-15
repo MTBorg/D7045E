@@ -1,5 +1,6 @@
-FILE(GLOB lab3_headers code/*.h)
 FILE(GLOB lab3_sources code/*.cpp)
+FILE(GLOB lab3_headers code/include/*.h)
+INCLUDE_DIRECTORIES(code/include)
 
 SET(files_lab3 ${lab3_headers} ${lab3_sources})
 SOURCE_GROUP("lab3" FILES ${files_lab3})

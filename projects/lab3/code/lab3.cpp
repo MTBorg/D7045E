@@ -14,6 +14,14 @@
 #include <stdlib.h>
 #include <map>
 
+//DEBUG
+#include "material.h"
+#include "mesh.h"
+#include "simple_material.h"
+#include "graphics_node.h"
+#include "shader.h"
+///
+
 const GLchar* vs =
 "#version 310 es\n"
 "precision mediump float;\n"
