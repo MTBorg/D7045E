@@ -22,42 +22,30 @@
 #include "shader.h"
 ///
 
-const GLchar* vs =
-"#version 310 es\n"
-"precision mediump float;\n"
-"layout(location=0) in vec2 pos;\n"
-"layout(location=1) in vec4 color;\n"
-"layout(location=0) out vec4 Color;\n"
-"uniform float angle;\n"
-"void main()\n"
-"{\n"
-" float offset = 10.f * float(gl_VertexID);\n"
-" float x = pos[0] + 0.05f * cos(angle + offset) / 4.f;\n"
-" float y = pos[1] + 0.05f * sin(angle + offset) / 4.f;\n"
-"	gl_Position = vec4(x, y, -1, 1);\n"
-" Color = color;\n"
-"}\n";
-
-const GLchar* ps =
-"#version 310 es\n"
-"precision mediump float;\n"
-"layout(location=0) in vec4 color;\n"
-"out vec4 Color;\n"
-"void main()\n"
-"{\n"
-"	Color = color;\n"
-"}\n";
-
 using namespace Display;
 
 Lab3App::Lab3App(){} 
 Lab3App::~Lab3App(){} 
 
+Mesh triangle = Mesh(
+	VertexVector(
+		/* { */
+		/* 	GlVec(0, 0.5f, 0), */
+		/* 	GlVec(-0.5f, 0, 0), */
+		/* 	GlVec(0.5f, 0, 0) */
+		/* } */
+	)
+);
+
+/* const std::vector<GraphicsNode> objects = { */
+/* 	GraphicsNode( */
+/* 			triangle, */
+/* 			new SimpleMaterial(Color(1.f, 0,0,1.f)), */
+/* 			glm::mat4(1.f) */
+/* 	) */
+/* }; */
+
 bool Lab3App::Open(){
-	/* printf("generating points...\n"); */
-
-	/* generateRandomTriangulationSet(5); */
-
 	App::Open();
 	this->window = new Display::Window;
 	this->window->SetSize(500,500);

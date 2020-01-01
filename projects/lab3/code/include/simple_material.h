@@ -9,8 +9,8 @@ class SimpleMaterial: public Material{
 private:
 	Color color;
 public:
-	SimpleMaterial();
-	void ApplyMaterial() override;
+	SimpleMaterial(Color color);
+	void applyMaterial() override;
 };
 
 #endif

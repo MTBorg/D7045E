@@ -2,12 +2,14 @@
 #define MATERIAL_H
 
 #include <GL/glew.h>
+#include "shader_program.h"
 
 class Material{
-private:
-	GLuint shaderProgram;
+protected:
+	ShaderProgram shaderProgram;
 public:
-	virtual void ApplyMaterial() = 0;
+	Material(ShaderProgram shaderProgram): shaderProgram(shaderProgram){}
+	virtual void applyMaterial() = 0;
 };
 
 #endif

@@ -13,8 +13,8 @@ private:
 	GLuint handle;
 	ShaderType type;
 public:
-	Shader(const std::string& shader);
-	inline GLuint getShader(){return handle;};
+	Shader(const char* const shader, ShaderType type);
+	inline GLuint getHandle() const {return handle;};
 	inline ShaderType getShaderType(){return type;};
 	inline void setShaderType(const ShaderType type){this->type = type;};
 };

@@ -8,9 +8,12 @@ class Mesh{
 private:
 	GLuint vao, vbo, ibo;
 	void setupVertexAttribPointers();
+	VertexVector vertices;
 public:
-	Mesh();
-	void loadVertices(const VertexVector& vertices);
+	Mesh(const VertexVector& vertices);
+	void bindVertexArrayObject();
+	void unbindVertexArrayObject();
+	inline const VertexVector& getVertices() const{return vertices;};
 };
 
 #endif

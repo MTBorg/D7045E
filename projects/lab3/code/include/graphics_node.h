@@ -9,9 +9,14 @@ class GraphicsNode{
 private:
 	Mesh* mesh;
 	Material* material;
-	glm::mat4 tranform;
+	glm::mat4 transform;
 public:
-	void Draw();
+	GraphicsNode(
+			Mesh * mesh,
+			Material* material,
+			glm::mat4 transform
+	): mesh(mesh), material(material), transform(transform){}
+	void draw();
 };
 
 #endif

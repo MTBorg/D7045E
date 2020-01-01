@@ -11,6 +11,7 @@ private:
 	GLuint program;
 public:
 	ShaderProgram(const std::vector<Shader>& shaders);
+	void activate();
 };
 
 #endif
