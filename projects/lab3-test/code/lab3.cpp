@@ -4,6 +4,7 @@
 #include "graphics_node.h"
 #include "types.h"
 #include "monochrome_material.h"
+#include "cube.h"
 
 
 using namespace Display;
