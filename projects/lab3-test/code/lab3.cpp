@@ -25,6 +25,7 @@ bool Lab3::Open()
 	{
 		// set clear color to gray
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glEnable(GL_DEPTH_TEST);
 
 		return true;
 	}
@@ -51,7 +52,8 @@ void Lab3::Run()
 	GraphicsNode cube = createCube();
 	while (this->window->IsOpen())
 	{
-		glClear(GL_COLOR_BUFFER_BIT);
+		/* glClear(GL_COLOR_BUFFER_BIT); */
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		this->window->Update();
 
 		cube.draw();
