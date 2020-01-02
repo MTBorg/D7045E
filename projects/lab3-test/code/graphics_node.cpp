@@ -3,6 +3,6 @@
 void GraphicsNode::draw(){
 	mesh->bindVAO();
 	material->applyMaterial();
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawArrays(GL_TRIANGLES, 0, 12);
 	mesh->unbindVAO();
 }

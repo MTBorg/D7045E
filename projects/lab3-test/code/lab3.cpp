@@ -33,28 +33,31 @@ bool Lab3::Open()
 
 void Lab3::Run()
 {
-	auto v1 = VertexVector {
-		Vertex(-1, 1.0f),
-		Vertex(0,0),
-		Vertex(-1, -1.0f)
-	};
-	auto v2 = VertexVector {
-		Vertex(1, 1.0f),
-		Vertex(0,0),
-		Vertex(1, -1.0f)
-	};
-	MonochromeMaterial m1 = MonochromeMaterial(RGBA(0, 1,0,1.f));
-	MonochromeMaterial m2 = MonochromeMaterial(RGBA(1, 0, 0,1.f));
+	/* auto v1 = VertexVector { */
+	/* 	Vertex(-1, 1.0f), */
+	/* 	Vertex(0,0), */
+	/* 	Vertex(-1, -1.0f) */
+	/* }; */
+	/* auto v2 = VertexVector { */
+	/* 	Vertex(1, 1.0f), */
+	/* 	Vertex(0,0), */
+	/* 	Vertex(1, -1.0f) */
+	/* }; */
+	/* MonochromeMaterial m1 = MonochromeMaterial(RGBA(0, 1,0,1.f)); */
+	/* MonochromeMaterial m2 = MonochromeMaterial(RGBA(1, 0, 0,1.f)); */
 
-	GraphicsNode g1 = GraphicsNode(new Mesh(v1), &m1);
-	GraphicsNode g2 = GraphicsNode(new Mesh(v2), &m2);
+	/* GraphicsNode g1 = GraphicsNode(new Mesh(v1), &m1); */
+	/* GraphicsNode g2 = GraphicsNode(new Mesh(v2), &m2); */
+	GraphicsNode cube = createCube();
 	while (this->window->IsOpen())
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
 		this->window->Update();
 
-		g1.draw();
-		g2.draw();
+		cube.draw();
+
+		/* g1.draw(); */
+		/* g2.draw(); */
 
 		this->window->SwapBuffers();
 	}
