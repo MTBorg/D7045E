@@ -9,7 +9,7 @@
 class MonochromeMaterial: public Material{
 private:
 	RGBA color;
-	static constexpr const GLchar* shader =
+	static constexpr const GLchar* fragmentShader =
 	"#version 310 es\n"
 	"precision mediump float;\n"
 	"layout(location=0) out vec4 Color;\n"
@@ -20,8 +20,11 @@ private:
 	"}\n";
 public:
 	MonochromeMaterial(const RGBA& color)
-		: Material(new ShaderProgram(std::vector<Shader>{Shader(shader)})),
-			color(color){}
+		: Material(new ShaderProgram(std::vector<Shader>{
+					Shader(fragmentShader, ShaderType::FragmentType),
+			})),
+			color(color){
+			}
 	void applyMaterial();
 };
 

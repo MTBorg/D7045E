@@ -8,7 +8,7 @@ void MonochromeMaterial::applyMaterial(){
 	if(colorUniform != 1){
 		glUniform4f(colorUniform, color.r, color.g, color.b, color.a);
 	}else{
-		printf("Failed, to locate uniform colorUniform\n");
+		printf("Failed to locate uniform colorUniform\n");
 	}
 	shaderProgram->activate();
 }
