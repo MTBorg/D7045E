@@ -18,7 +18,7 @@ Lab3::~Lab3() {}
 float32 x = 0;
 float32 y = 0;
 float32 z = 0;
-float32 xRotation = 45.0f;
+float32 xRotation = 0;
 float32 yRotation = 0;
 float32 zRotation = 0;
 const float32 movingDistance = 0.05f;
