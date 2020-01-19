@@ -15,7 +15,7 @@ private:
 public:
   GraphicsNode(Mesh *mesh, Material *material, glm::mat4 transform)
       : mesh(mesh), material(material), transform(transform) {}
-  void draw();
+  void draw() const;
   inline void updateTransform(glm::mat4 transform) {
     this->transform = transform;
   }

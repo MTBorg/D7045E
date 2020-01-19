@@ -111,16 +111,18 @@ bool Lab3::Open() {
 }
 
 void Lab3::Run() {
-  GraphicsNode cube = createCube(glm::vec3(0), RGBA(1, 0, 0, 1));
-  GraphicsNode cube2 =
-      createCube(glm::vec3(1.0f, -1.0f, -2.0f), RGBA(0, 1, 0, 1));
+  std::vector<GraphicsNode> nodes = {
+      createCube(glm::vec3(0), RGBA(1, 0, 0, 1)),
+      createCube(glm::vec3(1.0f, -1.0f, -2.0f), RGBA(0, 1, 0, 1)),
+      createCube(glm::vec3(-4.0f, 2.0f, -8.0f), RGBA(0, 0, 1, 1))};
   while (this->window->IsOpen()) {
-    cube.updateTransform(cubeTransform);
+    nodes[0].updateTransform(cubeTransform);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     this->window->Update();
 
-    cube.draw();
-    cube2.draw();
+    for (const auto &node : nodes) {
+      node.draw();
+    }
 
     this->window->SwapBuffers();
   }
