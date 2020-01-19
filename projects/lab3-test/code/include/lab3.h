@@ -8,7 +8,9 @@
 //------------------------------------------------------------------------------
 #include "config.h"
 #include "core/app.h"
+#include "graphics_node.h"
 #include "render/window.h"
+
 class Lab3 : public Core::App {
 public:
   Lab3();
@@ -16,7 +18,9 @@ public:
 
   bool Open();
   void Run();
+  void initObjects();
 
 private:
   Display::Window *window;
+  std::vector<GraphicsNode> objects;
 };
