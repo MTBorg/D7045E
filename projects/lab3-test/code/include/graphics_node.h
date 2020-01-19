@@ -1,16 +1,24 @@
 #ifndef GRAPHICS_NODE_H
 #define GRAPHICS_NODE_H
 
-#include "mesh.h"
-#include "material.h"
+#include <glm/glm.hpp>
 
-class GraphicsNode{
+#include "material.h"
+#include "mesh.h"
+
+class GraphicsNode {
 private:
-	Mesh* mesh;
-	Material* material;
+  Mesh *mesh;
+  Material *material;
+  glm::mat4 transform;
+
 public:
-	GraphicsNode(Mesh* mesh, Material* material): mesh(mesh), material(material){}
-	void draw();
+  GraphicsNode(Mesh *mesh, Material *material, glm::mat4 transform)
+      : mesh(mesh), material(material), transform(transform) {}
+  void draw();
+  inline void updateTransform(glm::mat4 transform) {
+    this->transform = transform;
+  }
 };
 
 #endif
