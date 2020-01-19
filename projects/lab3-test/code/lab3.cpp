@@ -18,54 +18,61 @@ Lab3::~Lab3() {}
 const float32 movingDistance = 0.05f;
 const float32 rotationAngle = 5.0f;
 
+unsigned int currentObject = 0;
+
 bool Lab3::Open() {
   App::Open();
   this->window = new Display::Window;
-  window->SetKeyPressFunction(
-      [this](int32 keyCode, int32, int32 action, int32) {
-        switch (keyCode) {
-        case GLFW_KEY_W:
-          this->objects[0].translate(glm::vec3(0, 0, -movingDistance));
-          break;
-        case GLFW_KEY_A:
-          this->objects[0].translate(glm::vec3(-movingDistance, 0, 0));
-          break;
-        case GLFW_KEY_S:
-          this->objects[0].translate(glm::vec3(0, 0, movingDistance));
-          break;
-        case GLFW_KEY_D:
-          this->objects[0].translate(glm::vec3(movingDistance, 0, 0));
-          break;
-        case GLFW_KEY_E:
-          this->objects[0].translate(glm::vec3(0, movingDistance, 0));
-          break;
-        case GLFW_KEY_Q:
-          this->objects[0].translate(glm::vec3(0, -movingDistance, 0));
-          break;
-        case GLFW_KEY_I:
-          this->objects[0].rotate(-rotationAngle, glm::vec3(1, 0, 0));
-          break;
-        case GLFW_KEY_J:
-          this->objects[0].rotate(-rotationAngle, glm::vec3(0, 1, 0));
-          break;
-        case GLFW_KEY_K:
-          this->objects[0].rotate(rotationAngle, glm::vec3(1, 0, 0));
-          break;
-        case GLFW_KEY_L:
-          this->objects[0].rotate(rotationAngle, glm::vec3(0, 1, 0));
-          break;
-        case GLFW_KEY_U:
-          this->objects[0].rotate(rotationAngle, glm::vec3(0, 0, 1));
-          break;
-        case GLFW_KEY_O:
-          this->objects[0].rotate(-rotationAngle, glm::vec3(0, 0, 1));
-          break;
-        case GLFW_KEY_ESCAPE:
-          this->window->Close();
-        default:
-          break;
-        }
-      });
+  window->SetKeyPressFunction([this](int32 keyCode, int32, int32 action,
+                                     int32) {
+    switch (keyCode) {
+    case GLFW_KEY_1:
+    case GLFW_KEY_2:
+    case GLFW_KEY_3:
+      currentObject = keyCode - GLFW_KEY_1;
+      break;
+    case GLFW_KEY_W:
+      this->objects[currentObject].translate(glm::vec3(0, 0, -movingDistance));
+      break;
+    case GLFW_KEY_A:
+      this->objects[currentObject].translate(glm::vec3(-movingDistance, 0, 0));
+      break;
+    case GLFW_KEY_S:
+      this->objects[currentObject].translate(glm::vec3(0, 0, movingDistance));
+      break;
+    case GLFW_KEY_D:
+      this->objects[currentObject].translate(glm::vec3(movingDistance, 0, 0));
+      break;
+    case GLFW_KEY_E:
+      this->objects[currentObject].translate(glm::vec3(0, movingDistance, 0));
+      break;
+    case GLFW_KEY_Q:
+      this->objects[currentObject].translate(glm::vec3(0, -movingDistance, 0));
+      break;
+    case GLFW_KEY_I:
+      this->objects[currentObject].rotate(-rotationAngle, glm::vec3(1, 0, 0));
+      break;
+    case GLFW_KEY_J:
+      this->objects[currentObject].rotate(-rotationAngle, glm::vec3(0, 1, 0));
+      break;
+    case GLFW_KEY_K:
+      this->objects[currentObject].rotate(rotationAngle, glm::vec3(1, 0, 0));
+      break;
+    case GLFW_KEY_L:
+      this->objects[currentObject].rotate(rotationAngle, glm::vec3(0, 1, 0));
+      break;
+    case GLFW_KEY_U:
+      this->objects[currentObject].rotate(rotationAngle, glm::vec3(0, 0, 1));
+      break;
+    case GLFW_KEY_O:
+      this->objects[currentObject].rotate(-rotationAngle, glm::vec3(0, 0, 1));
+      break;
+    case GLFW_KEY_ESCAPE:
+      this->window->Close();
+    default:
+      break;
+    }
+  });
 
   if (this->window->Open()) {
     // set clear color to gray
