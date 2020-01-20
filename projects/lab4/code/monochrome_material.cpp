@@ -4,7 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 
-void MonochromeMaterial::applyMaterial(glm::mat4 transform) {
+void MonochromeMaterial::applyMaterial(const glm::mat4 transform) {
   shaderProgram->activate();
 
   // TODO: Should this really be the responsibility of the material?

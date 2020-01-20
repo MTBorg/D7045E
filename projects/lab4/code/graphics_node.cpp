@@ -2,7 +2,7 @@
 
 void GraphicsNode::draw() const {
   mesh->bindVAO();
-  material->applyMaterial(transform);
+  material->applyMaterial(getTransform());
   glDrawArrays(GL_TRIANGLES, 0, 36);
   mesh->unbindVAO();
 }

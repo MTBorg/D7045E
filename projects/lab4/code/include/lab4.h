@@ -8,8 +8,8 @@
 //------------------------------------------------------------------------------
 #include "config.h"
 #include "core/app.h"
-#include "graphics_node.h"
 #include "render/window.h"
+#include "scene.h"
 
 class Lab4 : public Core::App {
 public:
@@ -22,5 +22,5 @@ public:
 
 private:
   Display::Window *window;
-  std::vector<GraphicsNode> objects;
+  Scene scene;
 };
