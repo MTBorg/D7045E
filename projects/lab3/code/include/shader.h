@@ -2,21 +2,21 @@
 #define SHADER_H
 
 #include <GL/glew.h>
-#include <string>
+#include <cstring>
 
 enum ShaderType{
-	Vertex, Fragment
+	VertexType,
+	FragmentType
 };
 
 class Shader{
 private:
-	GLuint handle;
-	ShaderType type;
+	GLuint shaderHandle;
+	const ShaderType type;
 public:
-	Shader(const char* const shader, ShaderType type);
-	inline GLuint getHandle() const {return handle;};
-	inline ShaderType getShaderType(){return type;};
-	inline void setShaderType(const ShaderType type){this->type = type;};
+	Shader(const GLchar* shader, const ShaderType type);
+	inline GLuint getHandle() const {return shaderHandle;}
+	inline GLuint getShaderType() const {return type;}
 };
 
 #endif

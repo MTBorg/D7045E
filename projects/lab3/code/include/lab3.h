@@ -1,23 +1,26 @@
 #pragma once
 //------------------------------------------------------------------------------
 /**
-	Application class used for example application.
-	
-	(C) 2015-2017 Individual contributors, see AUTHORS file
+        Application class used for example application.
+
+        (C) 2015-2017 Individual contributors, see AUTHORS file
 */
 //------------------------------------------------------------------------------
+#include "config.h"
 #include "core/app.h"
+#include "graphics_node.h"
 #include "render/window.h"
-class Lab3App : public Core::App
-{
+
+class Lab3 : public Core::App {
 public:
-	/// constructor
-	Lab3App();
-	/// destructor
-	~Lab3App();
+  Lab3();
+  ~Lab3();
 
-	bool Open();
-	void Run();
+  bool Open();
+  void Run();
+  void initObjects();
 
-	Display::Window* window;
+private:
+  Display::Window *window;
+  std::vector<GraphicsNode> objects;
 };

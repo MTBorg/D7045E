@@ -1,54 +1,29 @@
 #include "mesh.h"
 
-#include "types.h"
-#include <GL/glew.h>
-#include <iostream>
-
 Mesh::Mesh(const VertexVector& vertices){
-	printf("Mesh constructor");
-	this->vertices = vertices;
-	
-	return;
-	//Generate buffers
 	glGenBuffers(1, &vao);
-	glGenBuffers(1, &vbo);
-	glGenBuffers(1, &ibo);
-}
-
-void Mesh::setupVertexAttribPointers(){
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	
-	glVertexAttribPointer(
-			0,
-			3,
-			GL_FLOAT,
-			GL_FALSE,
-			sizeof(GlVec) + sizeof(Color),
-			0
-	);
-	glVertexAttribPointer(
-			1,
-			4,
-			GL_FLOAT,
-			GL_FALSE,
-			sizeof(GlVec) + sizeof(Color),
-			(void*)(sizeof(GlVec) + sizeof(Color))
-	);
-}
-
-void Mesh::bindVertexArrayObject(){
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vao);
 	glBufferData(
-			GL_ARRAY_BUFFER,
-			vertices.size() * sizeof(GLfloat),
-			&vertices[0],
-			GL_STATIC_DRAW
+		GL_ARRAY_BUFFER, 
+		vertices.size() * sizeof(glm::vec3), 
+		&vertices[0], 
+		GL_STATIC_DRAW
 	);
-
-	setupVertexAttribPointers();
 }
 
-void Mesh::unbindVertexArrayObject(){
+void Mesh::bindVAO(){
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vao);
+	glVertexAttribPointer(
+		0,                  
+		3,                  
+		GL_FLOAT,           
+		GL_FALSE,           
+		0,                  
+		(void*)0            
+	);
+}
 
+void Mesh::unbindVAO(){
+	glDisableVertexAttribArray(0);
 }

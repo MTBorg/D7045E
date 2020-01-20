@@ -1,19 +1,19 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include "types.h"
+#include <vector>
 #include <GL/glew.h>
+
+#include "types.h"
 
 class Mesh{
 private:
-	GLuint vao, vbo, ibo;
-	void setupVertexAttribPointers();
-	VertexVector vertices;
+	GLuint vao;
 public:
 	Mesh(const VertexVector& vertices);
-	void bindVertexArrayObject();
-	void unbindVertexArrayObject();
-	inline const VertexVector& getVertices() const{return vertices;};
+
+	void bindVAO();
+	void unbindVAO();
 };
 
 #endif

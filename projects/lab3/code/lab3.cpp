@@ -1,76 +1,103 @@
-//------------------------------------------------------------------------------
-// lab2.cpp
-// (C) 2015-2017 Individual contributors, see AUTHORS file
-//------------------------------------------------------------------------------
-#include "config.h"
 #include "lab3.h"
-#include <cstring>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
-#include <vector>
-#include <iostream>
-#include <fstream>
-#include <math.h>
-#include <stdlib.h>
-#include <map>
-
-//DEBUG
-#include "material.h"
-#include "mesh.h"
-#include "simple_material.h"
+#include "config.h"
+#include "cube.h"
 #include "graphics_node.h"
-#include "shader.h"
-///
+#include "mesh.h"
+#include "monochrome_material.h"
+#include "types.h"
+
+#include <glm/glm.hpp>
+#include <glm/vec3.hpp>
+#include <iostream>
 
 using namespace Display;
 
-Lab3App::Lab3App(){} 
-Lab3App::~Lab3App(){} 
+Lab3::Lab3() {}
+Lab3::~Lab3() {}
 
-Mesh triangle = Mesh(
-	VertexVector(
-		/* { */
-		/* 	GlVec(0, 0.5f, 0), */
-		/* 	GlVec(-0.5f, 0, 0), */
-		/* 	GlVec(0.5f, 0, 0) */
-		/* } */
-	)
-);
+const float32 movingDistance = 0.05f;
+const float32 rotationAngle = 5.0f;
 
-/* const std::vector<GraphicsNode> objects = { */
-/* 	GraphicsNode( */
-/* 			triangle, */
-/* 			new SimpleMaterial(Color(1.f, 0,0,1.f)), */
-/* 			glm::mat4(1.f) */
-/* 	) */
-/* }; */
+unsigned int currentObject = 0;
 
-bool Lab3App::Open(){
-	App::Open();
-	this->window = new Display::Window;
-	this->window->SetSize(500,500);
-	window->SetKeyPressFunction([this](int32 keyCode, int32, int32 action, int32)
-	{
-		if(keyCode == GLFW_KEY_ESCAPE){
-			this->window->Close();
-		}
-	});
+bool Lab3::Open() {
+  App::Open();
+  this->window = new Display::Window;
+  window->SetKeyPressFunction([this](int32 keyCode, int32, int32 action,
+                                     int32) {
+    switch (keyCode) {
+    case GLFW_KEY_1:
+    case GLFW_KEY_2:
+    case GLFW_KEY_3:
+      currentObject = keyCode - GLFW_KEY_1;
+      break;
+    case GLFW_KEY_W:
+      this->objects[currentObject].translate(glm::vec3(0, 0, -movingDistance));
+      break;
+    case GLFW_KEY_A:
+      this->objects[currentObject].translate(glm::vec3(-movingDistance, 0, 0));
+      break;
+    case GLFW_KEY_S:
+      this->objects[currentObject].translate(glm::vec3(0, 0, movingDistance));
+      break;
+    case GLFW_KEY_D:
+      this->objects[currentObject].translate(glm::vec3(movingDistance, 0, 0));
+      break;
+    case GLFW_KEY_E:
+      this->objects[currentObject].translate(glm::vec3(0, movingDistance, 0));
+      break;
+    case GLFW_KEY_Q:
+      this->objects[currentObject].translate(glm::vec3(0, -movingDistance, 0));
+      break;
+    case GLFW_KEY_I:
+      this->objects[currentObject].rotate(-rotationAngle, glm::vec3(1, 0, 0));
+      break;
+    case GLFW_KEY_J:
+      this->objects[currentObject].rotate(-rotationAngle, glm::vec3(0, 1, 0));
+      break;
+    case GLFW_KEY_K:
+      this->objects[currentObject].rotate(rotationAngle, glm::vec3(1, 0, 0));
+      break;
+    case GLFW_KEY_L:
+      this->objects[currentObject].rotate(rotationAngle, glm::vec3(0, 1, 0));
+      break;
+    case GLFW_KEY_U:
+      this->objects[currentObject].rotate(rotationAngle, glm::vec3(0, 0, 1));
+      break;
+    case GLFW_KEY_O:
+      this->objects[currentObject].rotate(-rotationAngle, glm::vec3(0, 0, 1));
+      break;
+    case GLFW_KEY_ESCAPE:
+      this->window->Close();
+    default:
+      break;
+    }
+  });
 
-	if (this->window->Open())
-	{
-		// set clear color to gray
-		glClearColor(1, 1,1,1);
-		return true;
-	}
-	return false;
+  if (this->window->Open()) {
+    // set clear color to gray
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glEnable(GL_DEPTH_TEST);
+
+    this->objects = std::vector<GraphicsNode>{
+        createCube(glm::vec3(0), RGBA(1, 0, 0, 1)),
+        createCube(glm::vec3(1.0f, -1.0f, -2.0f), RGBA(0, 1, 0, 1)),
+        createCube(glm::vec3(-4.0f, 2.0f, -8.0f), RGBA(0, 0, 1, 1))};
+
+    return true;
+  }
+  return false;
 }
 
-void Lab3App::Run(){
-	while (this->window->IsOpen())
-	{
-		glClear(GL_COLOR_BUFFER_BIT);
-		this->window->Update();
+void Lab3::Run() {
+  while (this->window->IsOpen()) {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    this->window->Update();
 
-		this->window->SwapBuffers();
-	}
+    for (const auto &object : objects) {
+      object.draw();
+    }
+
+    this->window->SwapBuffers();
+  }
 }

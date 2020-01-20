@@ -8,11 +8,12 @@
 int
 main(int argc, const char** argv)
 {
-	Lab3App app;
+	Lab3 app;
 	if (app.Open())
 	{
 		app.Run();
 		app.Close();
 	}
 	app.Exit();
+	
 }

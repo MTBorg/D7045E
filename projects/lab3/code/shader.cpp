@@ -1,13 +1,11 @@
 #include "shader.h"
 
-#include <string.h>
-
-Shader::Shader(
-		const char* const shader,
-		ShaderType type
-): type(type){
-	handle = glCreateShader(GL_FRAGMENT_SHADER);
+Shader::Shader(const GLchar* shader, const ShaderType type): type(type){
+	shaderHandle = glCreateShader(
+			type == ShaderType::VertexType ?
+				GL_VERTEX_SHADER : 
+				GL_FRAGMENT_SHADER);
 	GLint length = (GLint)strlen(shader);
-	glShaderSource(handle, 1, &shader, &length);
-	glCompileShader(handle);
-};
+	glShaderSource(shaderHandle, 1, &shader, &length);
+	glCompileShader(shaderHandle);
+}
