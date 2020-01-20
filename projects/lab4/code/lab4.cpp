@@ -1,4 +1,4 @@
-#include "lab3.h"
+#include "lab4.h"
 #include "config.h"
 #include "graphics_node.h"
 #include "mesh.h"
@@ -11,15 +11,15 @@
 
 using namespace Display;
 
-Lab3::Lab3() {}
-Lab3::~Lab3() {}
+Lab4::Lab4() {}
+Lab4::~Lab4() {}
 
 const float32 movingDistance = 0.05f;
 const float32 rotationAngle = 5.0f;
 
 unsigned int currentObject = 0;
 
-bool Lab3::Open() {
+bool Lab4::Open() {
   App::Open();
   this->window = new Display::Window;
   window->SetKeyPressFunction([this](int32 keyCode, int32, int32 action,
@@ -79,29 +79,22 @@ bool Lab3::Open() {
     glEnable(GL_DEPTH_TEST);
 
     this->objects = std::vector<GraphicsNode>{
-			GraphicsNode(
-				Mesh::createCuboid(),
-				new MonochromeMaterial(RGBA(1,0,0,1)),
-				glm::translate(glm::mat4(1), glm::vec3(0))
-			),
-			GraphicsNode(
-				Mesh::createCuboid(),
-				new MonochromeMaterial(RGBA(0, 1, 0, 1)),
-				glm::translate(glm::mat4(1), glm::vec3(1, -1, 2))
-			),
-			GraphicsNode(
-				Mesh::createCuboid(),
-				new MonochromeMaterial(RGBA(0,0,1,1)),
-				glm::translate(glm::mat4(1), glm::vec3(-4, 2, -8))
-			)
-		};
+        GraphicsNode(Mesh::createCuboid(),
+                     new MonochromeMaterial(RGBA(1, 0, 0, 1)),
+                     glm::translate(glm::mat4(1), glm::vec3(0))),
+        GraphicsNode(Mesh::createCuboid(),
+                     new MonochromeMaterial(RGBA(0, 1, 0, 1)),
+                     glm::translate(glm::mat4(1), glm::vec3(1, -1, 2))),
+        GraphicsNode(Mesh::createCuboid(),
+                     new MonochromeMaterial(RGBA(0, 0, 1, 1)),
+                     glm::translate(glm::mat4(1), glm::vec3(-4, 2, -8)))};
 
     return true;
   }
   return false;
 }
 
-void Lab3::Run() {
+void Lab4::Run() {
   while (this->window->IsOpen()) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     this->window->Update();
