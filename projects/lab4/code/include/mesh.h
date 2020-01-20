@@ -14,6 +14,8 @@ public:
 
 	void bindVAO();
 	void unbindVAO();
+
+	static Mesh* createCuboid();
 };
 
 #endif

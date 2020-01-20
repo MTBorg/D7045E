@@ -1,6 +1,5 @@
 #include "lab3.h"
 #include "config.h"
-#include "cube.h"
 #include "graphics_node.h"
 #include "mesh.h"
 #include "monochrome_material.h"
@@ -80,9 +79,22 @@ bool Lab3::Open() {
     glEnable(GL_DEPTH_TEST);
 
     this->objects = std::vector<GraphicsNode>{
-        createCube(glm::vec3(0), RGBA(1, 0, 0, 1)),
-        createCube(glm::vec3(1.0f, -1.0f, -2.0f), RGBA(0, 1, 0, 1)),
-        createCube(glm::vec3(-4.0f, 2.0f, -8.0f), RGBA(0, 0, 1, 1))};
+			GraphicsNode(
+				Mesh::createCuboid(),
+				new MonochromeMaterial(RGBA(1,0,0,1)),
+				glm::translate(glm::mat4(1), glm::vec3(0))
+			),
+			GraphicsNode(
+				Mesh::createCuboid(),
+				new MonochromeMaterial(RGBA(0, 1, 0, 1)),
+				glm::translate(glm::mat4(1), glm::vec3(1, -1, 2))
+			),
+			GraphicsNode(
+				Mesh::createCuboid(),
+				new MonochromeMaterial(RGBA(0,0,1,1)),
+				glm::translate(glm::mat4(1), glm::vec3(-4, 2, -8))
+			)
+		};
 
     return true;
   }

@@ -27,3 +27,25 @@ void Mesh::bindVAO(){
 void Mesh::unbindVAO(){
 	glDisableVertexAttribArray(0);
 }
+
+Mesh* Mesh::createCuboid(){
+	return new Mesh(VertexVector{
+			Vertex(-0.5f, -0.5f, -0.5f), Vertex(0.5f, -0.5f, -0.5f),
+			Vertex(0.5f, 0.5f, -0.5f),   Vertex(0.5f, 0.5f, -0.5f),
+			Vertex(-0.5f, 0.5f, -0.5f),  Vertex(-0.5f, -0.5f, -0.5f),
+			Vertex(-0.5f, -0.5f, 0.5f),  Vertex(0.5f, -0.5f, 0.5f),
+			Vertex(0.5f, 0.5f, 0.5f),    Vertex(0.5f, 0.5f, 0.5f),
+			Vertex(-0.5f, 0.5f, 0.5f),   Vertex(-0.5f, -0.5f, 0.5f),
+			Vertex(-0.5f, 0.5f, 0.5f),   Vertex(-0.5f, 0.5f, -0.5f),
+			Vertex(-0.5f, -0.5f, -0.5f), Vertex(-0.5f, -0.5f, -0.5f),
+			Vertex(-0.5f, -0.5f, 0.5f),  Vertex(-0.5f, 0.5f, 0.5f),
+			Vertex(0.5f, 0.5f, 0.5f),    Vertex(0.5f, 0.5f, -0.5f),
+			Vertex(0.5f, -0.5f, -0.5f),  Vertex(0.5f, -0.5f, -0.5f),
+			Vertex(0.5f, -0.5f, 0.5f),   Vertex(0.5f, 0.5f, 0.5f),
+			Vertex(-0.5f, -0.5f, -0.5f), Vertex(0.5f, -0.5f, -0.5f),
+			Vertex(0.5f, -0.5f, 0.5f),   Vertex(0.5f, -0.5f, 0.5f),
+			Vertex(-0.5f, -0.5f, 0.5f),  Vertex(-0.5f, -0.5f, -0.5f),
+			Vertex(-0.5f, 0.5f, -0.5f),  Vertex(0.5f, 0.5f, -0.5f),
+			Vertex(0.5f, 0.5f, 0.5f),    Vertex(0.5f, 0.5f, 0.5f),
+			Vertex(-0.5f, 0.5f, 0.5f),   Vertex(-0.5f, 0.5f, -0.5f)});
+}
