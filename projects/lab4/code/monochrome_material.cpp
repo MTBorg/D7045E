@@ -4,7 +4,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 
-void MonochromeMaterial::applyMaterial(const glm::mat4 transform) {
+void MonochromeMaterial::applyMaterial(const glm::mat4 &transform,
+                                       const glm::mat4 &view) {
   shaderProgram->activate();
 
   // TODO: Should this really be the responsibility of the material?
@@ -21,7 +22,6 @@ void MonochromeMaterial::applyMaterial(const glm::mat4 transform) {
   // TODO: Should this really be the responsibility of the material?
   GLint viewUniform = glGetUniformLocation(shaderProgram->program, "view");
   if (viewUniform != -1) {
-    auto view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -3.0f));
     glUniformMatrix4fv(viewUniform, 1, GL_FALSE, &view[0][0]);
   } else {
     printf("Failed to locate uniform view\n");

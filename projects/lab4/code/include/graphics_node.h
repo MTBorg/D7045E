@@ -23,7 +23,7 @@ private:
 public:
   GraphicsNode(Mesh *mesh, Material *material, glm::mat4 transform)
       : Node(transform), mesh(mesh), material(material) {}
-  void draw() const;
+  void draw(const glm::mat4 &view) const;
   void update() override {
     // Apply the matrix transforms
     auto result = transform;

@@ -10,7 +10,8 @@ protected:
 
 public:
   Material(ShaderProgram *shaderProgram) : shaderProgram(shaderProgram) {}
-  virtual void applyMaterial(const glm::mat4 transform) = 0;
+  virtual void applyMaterial(const glm::mat4 &transform,
+                             const glm::mat4 &view) = 0;
 };
 
 #endif

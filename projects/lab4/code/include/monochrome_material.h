@@ -42,7 +42,7 @@ public:
             Shader(fragmentShader, ShaderType::FragmentType),
             Shader(vertexShader, ShaderType::VertexType)})),
         color(color) {}
-  void applyMaterial(glm::mat4);
+  void applyMaterial(const glm::mat4 &transform, const glm::mat4 &view);
 };
 
 #endif
