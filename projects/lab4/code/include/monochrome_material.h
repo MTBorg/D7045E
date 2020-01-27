@@ -13,27 +13,26 @@ private:
       "#version 310 es\n"
       "precision mediump float;\n"
       "layout(location=0) in vec3 pos;\n"
-      "out vec4 position;\n"
       "uniform mat4 model;\n"
       "uniform mat4 view;\n"
       "uniform mat4 projection;\n"
       "void main()\n"
       "{\n"
-      "	position = projection * view * model * vec4(pos, 1.0);\n"
-      " gl_Position = position;\n"
+      "	gl_Position = projection * view * model * vec4(pos, 1.0);\n"
       "}\n";
   static constexpr const GLchar *fragmentShader =
       "#version 310 es\n"
       "precision mediump float;\n"
-      "in vec4 position;\n"
       "layout(location=0) out vec4 Color;\n"
       "uniform vec4 color;\n"
       "void main()\n"
       "{\n"
-      " float dist = distance(vec4(0,0,0,0), position);\n"
-      " float darkness = 4.0f;"
-      "	Color = vec4(color.r / dist / darkness, color.g / dist / darkness, "
-      "color.b / dist / darkness, 1.0);\n"
+      " float ambientStrength = 0.1; \n"
+      // TODO: Maybe pass ambient light color through uniform ?
+      " vec3 lightingColor = vec3(1,1,1);\n"
+      " vec3 ambient = ambientStrength * lightingColor; \n"
+      " vec3 result = ambient * vec3(color); \n"
+      "	Color = vec4(result, 1.0);\n"
       "}\n";
 
 public:
