@@ -6,6 +6,6 @@ void Scene::render() {
   }
 
   for (const auto &object : objectsMovable) {
-    object.draw(camera.getViewMatrix());
+    object.draw(camera.getViewMatrix(), lightSource);
   }
 }

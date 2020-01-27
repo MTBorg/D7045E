@@ -1,6 +1,7 @@
 #ifndef MONOCHROME_MATERIAL_H
 #define MONOCHROME_MATERIAL_H
 
+#include "light_source.h"
 #include "material.h"
 #include "shader.h"
 #include "shader_program.h"
@@ -32,19 +33,19 @@ private:
       "in vec3 FragmentPos;\n"
       "in vec3 Normal;\n"
       "uniform vec4 color;\n"
+      "uniform vec3 lightPos;\n"
+      "uniform vec3 lightColor;\n"
+      "uniform float lightIntensity;\n"
       "void main()\n"
       "{\n"
-      " vec3 lightPos = vec3(1,1,1);\n"
-      // TODO: Maybe pass ambient light color through uniform ?
-      " vec3 lightingColor = vec3(1,1,1);\n"
       " vec3 objectColor = vec3(color);\n"
-      " float ambientStrength = 0.1; \n"
+      " float ambientStrength = lightIntensity; \n"
 
       " vec3 norm = normalize(Normal);\n"
       " vec3 lightDir = normalize(lightPos - FragmentPos); \n"
-      " vec3 ambient = ambientStrength * lightingColor; \n"
+      " vec3 ambient = ambientStrength * lightColor; \n"
       " float diff = max(dot(norm, lightDir), 0.0);\n"
-      " vec3 diffuse = diff * lightingColor;\n"
+      " vec3 diffuse = diff * lightColor;\n"
       " vec3 result = (ambient + diffuse) * objectColor;\n"
       " FragColor = vec4(result, 1.0);\n"
       "}\n";
@@ -55,7 +56,8 @@ public:
             Shader(fragmentShader, ShaderType::FragmentType),
             Shader(vertexShader, ShaderType::VertexType)})),
         color(color) {}
-  void applyMaterial(const glm::mat4 &transform, const glm::mat4 &view);
+  void applyMaterial(const glm::mat4 &transform, const glm::mat4 &view,
+                     const LightSource &lightSource);
 };
 
 #endif

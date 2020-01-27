@@ -5,14 +5,18 @@
 
 #include "camera.h"
 #include "graphics_node.h"
+#include "light_source.h"
 
 class Scene {
 public:
   std::vector<GraphicsNode> objectsMovable;
-  void render();
   Camera camera;
+  LightSource lightSource;
 
-  Scene(Camera camera) : camera(camera) {}
+  void render();
+
+  Scene(Camera camera, LightSource lightSource)
+      : camera(camera), lightSource(lightSource) {}
 };
 
 #endif

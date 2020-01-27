@@ -8,6 +8,7 @@
 
 #include "node.h"
 
+#include "light_source.h"
 #include "material.h"
 #include "mesh.h"
 
@@ -23,7 +24,7 @@ private:
 public:
   GraphicsNode(Mesh *mesh, Material *material, glm::mat4 transform)
       : Node(transform), mesh(mesh), material(material) {}
-  void draw(const glm::mat4 &view) const;
+  void draw(const glm::mat4 &view, const LightSource &lightSource) const;
   void update() override {
     // Apply the matrix transforms
     auto result = transform;

@@ -8,6 +8,7 @@
 typedef glm::vec3 Vertex;
 typedef glm::vec3 Normal;
 typedef glm::vec4 RGBA;
+typedef glm::vec3 RGB;
 typedef std::vector<Vertex> VertexVector;
 typedef std::vector<Normal> NormalVector;
 

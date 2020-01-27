@@ -5,15 +5,13 @@
 #include <iostream>
 
 void MonochromeMaterial::applyMaterial(const glm::mat4 &transform,
-                                       const glm::mat4 &view) {
+                                       const glm::mat4 &view,
+                                       const LightSource &lightSource) {
   shaderProgram->activate();
 
   // TODO: Should this really be the responsibility of the material?
   GLint modelUniform = glGetUniformLocation(shaderProgram->program, "model");
   if (modelUniform != -1) {
-    /* auto model = glm::translate(glm::mat4(1.0f), transform); */
-    /* model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), */
-    /*                     glm::vec3(0.5f, 1.0f, 0.0f)); */
     glUniformMatrix4fv(modelUniform, 1, GL_FALSE, &transform[0][0]);
   } else {
     printf("Failed to locate uniform model\n");
@@ -42,5 +40,35 @@ void MonochromeMaterial::applyMaterial(const glm::mat4 &transform,
     glUniform4f(colorUniform, color.r, color.g, color.b, color.a);
   } else {
     printf("Failed to locate uniform color\n");
+  }
+
+  GLint lightPosUniform =
+      glGetUniformLocation(shaderProgram->program, "lightPos");
+  auto lightPosTransform = lightSource.getTransform();
+
+  if (lightPosUniform != -1) {
+    glUniform3f(lightPosUniform, lightPosTransform[3][0],
+                lightPosTransform[3][1], lightPosTransform[3][2]);
+  } else {
+    printf("Failed to locate uniform lightPos\n");
+  }
+
+  GLint lightColorUniform =
+      glGetUniformLocation(shaderProgram->program, "lightColor");
+  auto lightColor = lightSource.getColor();
+
+  if (lightColorUniform != -1) {
+    glUniform3f(lightColorUniform, lightColor.r, lightColor.g, lightColor.b);
+  } else {
+    printf("Failed to locate uniform lightColor\n");
+  }
+
+  GLint lightIntensityUniform =
+      glGetUniformLocation(shaderProgram->program, "lightIntensity");
+
+  if (lightIntensityUniform != -1) {
+    glUniform1f(lightIntensityUniform, lightSource.getIntensity());
+  } else {
+    printf("Failed to locate uniform lightIntensity\n");
   }
 }
