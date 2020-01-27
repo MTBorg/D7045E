@@ -1,21 +1,22 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include <vector>
 #include <GL/glew.h>
+#include <vector>
 
 #include "types.h"
 
-class Mesh{
+class Mesh {
 private:
-	GLuint vao;
+  GLuint vao;
+
 public:
-	Mesh(const VertexVector& vertices);
+  Mesh(const VertexVector &vertices, const NormalVector &normals);
 
-	void bindVAO();
-	void unbindVAO();
+  void bindVAO();
+  void unbindVAO();
 
-	static Mesh* createCuboid();
+  static Mesh *createCuboid();
 };
 
 #endif

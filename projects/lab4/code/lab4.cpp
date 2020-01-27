@@ -160,7 +160,7 @@ bool Lab4::Open() {
                      glm::translate(glm::mat4(1), glm::vec3(0))),
         GraphicsNode(Mesh::createCuboid(),
                      new MonochromeMaterial(RGBA(0, 1, 0, 1)),
-                     glm::translate(glm::mat4(1), glm::vec3(1, -1, -10))),
+                     glm::translate(glm::mat4(1), glm::vec3(1, -1, -4))),
         GraphicsNode(Mesh::createCuboid(),
                      new MonochromeMaterial(RGBA(0, 0, 1, 1)),
                      glm::translate(glm::mat4(1), glm::vec3(-4, 2, -8))),
