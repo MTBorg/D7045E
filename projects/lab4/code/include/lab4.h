@@ -25,7 +25,7 @@ public:
 private:
   Display::Window *window;
   Scene scene =
-      Scene(Camera(glm::translate(glm::mat4(1), glm::vec3(0, 0, 4))),
+      Scene(Camera(glm::translate(glm::mat4(1), glm::vec3(0, 7, 4))),
             LightSource(glm::translate(glm::mat4(1), glm::vec3(0, 0, 4)),
                         RGB(1, 1, 1), 0.1));
 };

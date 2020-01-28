@@ -38,16 +38,16 @@ void oscillate(glm::mat4 *transform) {
 void handleCameraControls(int32 keyCode, int32 action, Scene &scene) {
   switch (keyCode) {
   case GLFW_KEY_W:
-    scene.camera.translate(glm::vec3(0, 0, -movingDistance));
+    scene.camera.translateGlobal(glm::vec3(0, 0, -movingDistance));
     break;
   case GLFW_KEY_A:
-    scene.camera.translate(glm::vec3(-movingDistance, 0, 0));
+    scene.camera.translateGlobal(glm::vec3(-movingDistance, 0, 0));
     break;
   case GLFW_KEY_S:
-    scene.camera.translate(glm::vec3(0, 0, movingDistance));
+    scene.camera.translateGlobal(glm::vec3(0, 0, movingDistance));
     break;
   case GLFW_KEY_D:
-    scene.camera.translate(glm::vec3(movingDistance, 0, 0));
+    scene.camera.translateGlobal(glm::vec3(movingDistance, 0, 0));
     break;
   case GLFW_KEY_J:
     scene.camera.rotate(glm::vec3(0, 1, 0), cameraRotationAngle);
