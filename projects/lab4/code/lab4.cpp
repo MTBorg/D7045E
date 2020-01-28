@@ -153,6 +153,11 @@ bool Lab4::Open() {
         glm::translate(glm::mat4(1), glm::vec3(0, -1, -2)));
     animatedCube.setAnimation(oscillate);
 
+    auto floor = GraphicsNode(
+        Mesh::createCuboid(), new MonochromeMaterial(RGBA(0.5, 0.5, 0.5, 1)),
+        glm::translate(glm::mat4(1), glm::vec3(0, -5, 0)));
+    floor.scale(1000, 1, 1000);
+
     this->scene.objectsMovable = std::vector<GraphicsNode>{
         animatedCube,
         GraphicsNode(Mesh::createCuboid(),
@@ -164,7 +169,8 @@ bool Lab4::Open() {
         GraphicsNode(Mesh::createCuboid(),
                      new MonochromeMaterial(RGBA(0, 0, 1, 1)),
                      glm::translate(glm::mat4(1), glm::vec3(-4, 2, -8))),
-        animatedCube};
+        animatedCube,
+        floor};
 
     return true;
   }
