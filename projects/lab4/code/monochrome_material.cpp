@@ -71,4 +71,12 @@ void MonochromeMaterial::applyMaterial(const glm::mat4 &transform,
   } else {
     printf("Failed to locate uniform lightIntensity\n");
   }
+
+  GLint cameraPosUniform =
+      glGetUniformLocation(shaderProgram->program, "cameraPos");
+  if (cameraPosUniform != -1) {
+    glUniform3f(cameraPosUniform, view[3][0], view[3][1], view[3][2]);
+  } else {
+    printf("Failed to locate uniform cameraPos\n");
+  }
 }

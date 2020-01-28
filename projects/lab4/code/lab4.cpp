@@ -157,7 +157,7 @@ bool Lab4::Open() {
         animatedCube,
         GraphicsNode(Mesh::createCuboid(),
                      new MonochromeMaterial(RGBA(1, 0, 0, 1)),
-                     glm::translate(glm::mat4(1), glm::vec3(0))),
+                     glm::translate(glm::mat4(1), glm::vec3(2, 0, -4))),
         GraphicsNode(Mesh::createCuboid(),
                      new MonochromeMaterial(RGBA(0, 1, 0, 1)),
                      glm::translate(glm::mat4(1), glm::vec3(1, -1, -4))),

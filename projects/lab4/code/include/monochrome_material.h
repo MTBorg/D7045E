@@ -35,18 +35,25 @@ private:
       "uniform vec4 color;\n"
       "uniform vec3 lightPos;\n"
       "uniform vec3 lightColor;\n"
+      "uniform vec3 cameraPos;\n"
       "uniform float lightIntensity;\n"
       "void main()\n"
       "{\n"
       " vec3 objectColor = vec3(color);\n"
       " float ambientStrength = lightIntensity; \n"
+      " float specularStrength = 0.5f;\n"
 
       " vec3 norm = normalize(Normal);\n"
       " vec3 lightDir = normalize(lightPos - FragmentPos); \n"
       " vec3 ambient = ambientStrength * lightColor; \n"
       " float diff = max(dot(norm, lightDir), 0.0);\n"
       " vec3 diffuse = diff * lightColor;\n"
-      " vec3 result = (ambient + diffuse) * objectColor;\n"
+      " vec3 viewDir = normalize(cameraPos - FragmentPos);\n"
+      " vec3 reflectDir = reflect(-lightDir, norm);\n"
+      " float spec = pow(max(dot(viewDir, reflectDir), 0.0f), 32.f);\n"
+      " vec3 specular = specularStrength * spec * lightColor;\n"
+
+      " vec3 result = (ambient + diffuse + specular) * objectColor;\n"
       " FragColor = vec4(result, 1.0);\n"
       "}\n";
 
