@@ -19,13 +19,18 @@ private:
   Mesh *mesh;
   Material *material;
   std::vector<glm::mat4> transformUpdates;
+  std::vector<GraphicsNode *> children;
   void (*animation)(glm::mat4 *transform) = nullptr;
 
 public:
-  GraphicsNode(Mesh *mesh, Material *material, glm::mat4 transform)
-      : Node(transform), mesh(mesh), material(material) {}
-  void draw(const glm::mat4 &view, const LightSource &lightSource) const;
+  GraphicsNode(
+      Mesh *mesh, Material *material, glm::mat4 transform,
+      std::vector<GraphicsNode *> children = std::vector<GraphicsNode *>())
+      : Node(transform), mesh(mesh), material(material), children(children) {}
+  void draw(const glm::mat4 &view, const LightSource &lightSource,
+            const glm::mat4 *const parentTransform = nullptr) const;
   void update() override {
+
     // Apply the matrix transforms
     auto result = transform;
     for (const auto &update : transformUpdates) {

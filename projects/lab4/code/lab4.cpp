@@ -72,51 +72,51 @@ void handleObjectControls(int32 keyCode, int32 action, Scene &scene) {
     currentObject = keyCode - GLFW_KEY_1;
     break;
   case GLFW_KEY_W:
-    scene.objectsMovable[currentObject].addTransformUpdate(
+    scene.objectsMovable[currentObject]->addTransformUpdate(
         glm::translate(glm::mat4(1), glm::vec3(0, 0, -movingDistance)));
     break;
   case GLFW_KEY_A:
-    scene.objectsMovable[currentObject].addTransformUpdate(
+    scene.objectsMovable[currentObject]->addTransformUpdate(
         glm::translate(glm::mat4(1), glm::vec3(-movingDistance, 0, 0)));
     break;
   case GLFW_KEY_S:
-    scene.objectsMovable[currentObject].addTransformUpdate(
+    scene.objectsMovable[currentObject]->addTransformUpdate(
         glm::translate(glm::mat4(1), glm::vec3(0, 0, movingDistance)));
     break;
   case GLFW_KEY_D:
-    scene.objectsMovable[currentObject].addTransformUpdate(
+    scene.objectsMovable[currentObject]->addTransformUpdate(
         glm::translate(glm::mat4(1), glm::vec3(movingDistance, 0, 0)));
     break;
   case GLFW_KEY_E:
-    scene.objectsMovable[currentObject].addTransformUpdate(
+    scene.objectsMovable[currentObject]->addTransformUpdate(
         glm::translate(glm::mat4(1), glm::vec3(0, movingDistance, 0)));
     break;
   case GLFW_KEY_Q:
-    scene.objectsMovable[currentObject].addTransformUpdate(
+    scene.objectsMovable[currentObject]->addTransformUpdate(
         glm::translate(glm::mat4(1), glm::vec3(0, -movingDistance, 0)));
     break;
   case GLFW_KEY_I:
-    scene.objectsMovable[currentObject].addTransformUpdate(glm::rotate(
+    scene.objectsMovable[currentObject]->addTransformUpdate(glm::rotate(
         glm::mat4(1), glm::radians(-rotationAngle), glm::vec3(1, 0, 0)));
     break;
   case GLFW_KEY_J:
-    scene.objectsMovable[currentObject].addTransformUpdate(glm::rotate(
+    scene.objectsMovable[currentObject]->addTransformUpdate(glm::rotate(
         glm::mat4(1), glm::radians(-rotationAngle), glm::vec3(0, 1, 0)));
     break;
   case GLFW_KEY_K:
-    scene.objectsMovable[currentObject].addTransformUpdate(glm::rotate(
+    scene.objectsMovable[currentObject]->addTransformUpdate(glm::rotate(
         glm::mat4(1), glm::radians(rotationAngle), glm::vec3(1, 0, 0)));
     break;
   case GLFW_KEY_L:
-    scene.objectsMovable[currentObject].addTransformUpdate(glm::rotate(
+    scene.objectsMovable[currentObject]->addTransformUpdate(glm::rotate(
         glm::mat4(1), glm::radians(rotationAngle), glm::vec3(0, 1, 0)));
     break;
   case GLFW_KEY_U:
-    scene.objectsMovable[currentObject].addTransformUpdate(glm::rotate(
+    scene.objectsMovable[currentObject]->addTransformUpdate(glm::rotate(
         glm::mat4(1), glm::radians(rotationAngle), glm::vec3(0, 0, 1)));
     break;
   case GLFW_KEY_O:
-    scene.objectsMovable[currentObject].addTransformUpdate(glm::rotate(
+    scene.objectsMovable[currentObject]->addTransformUpdate(glm::rotate(
         glm::mat4(1), glm::radians(-rotationAngle), glm::vec3(0, 0, 1)));
     break;
   }
@@ -148,27 +148,32 @@ bool Lab4::Open() {
     // set clear color to gray
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glEnable(GL_DEPTH_TEST);
-    auto animatedCube = GraphicsNode(
+    auto animatedCube = new GraphicsNode(
         Mesh::createCuboid(), new MonochromeMaterial(RGBA(0, 1, 1, 1)),
         glm::translate(glm::mat4(1), glm::vec3(0, -1, -2)));
-    animatedCube.setAnimation(oscillate);
+    animatedCube->setAnimation(oscillate);
 
     // The floor of the room
-    auto floor = GraphicsNode(
+    auto floor = new GraphicsNode(
         Mesh::createCuboid(), new MonochromeMaterial(RGBA(0.5, 0.5, 0.5, 1)),
         glm::translate(glm::mat4(1), glm::vec3(0, -10, 0)));
-    floor.scale(1000, 1, 1000);
+    floor->scale(1000, 1, 1000);
+
+    auto scaledCube = GraphicsNode(
+        Mesh::createCuboid(), new MonochromeMaterial(RGBA(1, 1, 1, 1)),
+        glm::translate(glm::mat4(1), glm::vec3(0, -5, 0)));
+    scaledCube.scale(10, 1, 20);
 
     this->scene.objectsStatic = std::vector<GraphicsNode>{
-        GraphicsNode(Mesh::createCuboid(),
-                     new MonochromeMaterial(RGBA(1, 1, 1, 1)),
-                     glm::translate(glm::mat4(1), glm::vec3(-10, -3, -20))),
+        scaledCube,
+
         GraphicsNode(Mesh::createCuboid(),
                      new MonochromeMaterial(RGBA(1, 0, 1, 1)),
                      glm::translate(glm::mat4(1), glm::vec3(10, 3, -20))),
         GraphicsNode(Mesh::createCuboid(),
                      new MonochromeMaterial(RGBA(0, 1, 1, 1)),
                      glm::translate(glm::mat4(1), glm::vec3(-5, -2, -15))),
+
         GraphicsNode(Mesh::createCuboid(),
                      new MonochromeMaterial(RGBA(1, 1, 0, 1)),
                      glm::translate(glm::mat4(1), glm::vec3(0, -5, -10))),
@@ -184,6 +189,7 @@ bool Lab4::Open() {
         GraphicsNode(Mesh::createCuboid(),
                      new MonochromeMaterial(RGBA(1, 1, 0, 1)),
                      glm::translate(glm::mat4(1), glm::vec3(-4, -5, -17))),
+
         GraphicsNode(Mesh::createCuboid(),
                      new MonochromeMaterial(RGBA(1, 1, 1, 1)),
                      glm::translate(glm::mat4(1), glm::vec3(-10, -3, 5))),
@@ -193,6 +199,7 @@ bool Lab4::Open() {
         GraphicsNode(Mesh::createCuboid(),
                      new MonochromeMaterial(RGBA(0, 1, 1, 1)),
                      glm::translate(glm::mat4(1), glm::vec3(-1, -6, -15))),
+
         GraphicsNode(Mesh::createCuboid(),
                      new MonochromeMaterial(RGBA(1, 1, 0, 1)),
                      glm::translate(glm::mat4(1), glm::vec3(0, -5, -12))),
@@ -209,17 +216,30 @@ bool Lab4::Open() {
                      new MonochromeMaterial(RGBA(1, 1, 0, 1)),
                      glm::translate(glm::mat4(1), glm::vec3(-4, -5, -17)))};
 
-    this->scene.objectsMovable = std::vector<GraphicsNode>{
+    auto treeCube1 = new GraphicsNode(
+        Mesh::createCuboid(), new MonochromeMaterial(RGBA(0, 1, 0, 1)),
+        glm::translate(glm::mat4(1), glm::vec3(0, 0, 0)),
+        std::vector<GraphicsNode *>{
+            new GraphicsNode(
+                Mesh::createCuboid(), new MonochromeMaterial(RGBA(0, 0, 1, 1)),
+                glm::translate(glm::mat4(1), glm::vec3(0, 0, 1)),
+                std::vector<GraphicsNode *>{new GraphicsNode(
+                    Mesh::createCuboid(),
+                    new MonochromeMaterial(RGBA(0, 1, 0, 1)),
+                    glm::translate(glm::mat4(1), glm::vec3(1, 0, -5)))}),
+        });
+    this->scene.objectsMovable = std::vector<GraphicsNode *>{
         animatedCube,
-        GraphicsNode(Mesh::createCuboid(),
-                     new MonochromeMaterial(RGBA(1, 0, 0, 1)),
-                     glm::translate(glm::mat4(1), glm::vec3(2, 0, -4))),
-        GraphicsNode(Mesh::createCuboid(),
-                     new MonochromeMaterial(RGBA(0, 1, 0, 1)),
-                     glm::translate(glm::mat4(1), glm::vec3(1, -1, -4))),
-        GraphicsNode(Mesh::createCuboid(),
-                     new MonochromeMaterial(RGBA(0, 0, 1, 1)),
-                     glm::translate(glm::mat4(1), glm::vec3(-4, 2, -8))),
+        treeCube1,
+        new GraphicsNode(Mesh::createCuboid(),
+                         new MonochromeMaterial(RGBA(1, 0, 0, 1)),
+                         glm::translate(glm::mat4(1), glm::vec3(2, 0, -4))),
+        new GraphicsNode(Mesh::createCuboid(),
+                         new MonochromeMaterial(RGBA(0, 1, 0, 1)),
+                         glm::translate(glm::mat4(1), glm::vec3(1, -1, -4))),
+        new GraphicsNode(Mesh::createCuboid(),
+                         new MonochromeMaterial(RGBA(0, 0, 1, 1)),
+                         glm::translate(glm::mat4(1), glm::vec3(-4, 2, -8))),
         animatedCube,
         floor};
 

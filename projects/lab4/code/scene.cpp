@@ -2,11 +2,11 @@
 
 void Scene::render() {
   for (auto &object : objectsMovable) {
-    object.update();
+    object->update();
   }
 
   for (const auto &object : objectsMovable) {
-    object.draw(camera.getViewMatrix(), lightSource);
+    object->draw(camera.getViewMatrix(), lightSource);
   }
 
   for (const auto &object : objectsStatic) {
