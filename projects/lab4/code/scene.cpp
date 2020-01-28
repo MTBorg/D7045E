@@ -8,4 +8,8 @@ void Scene::render() {
   for (const auto &object : objectsMovable) {
     object.draw(camera.getViewMatrix(), lightSource);
   }
+
+  for (const auto &object : objectsStatic) {
+    object.draw(camera.getViewMatrix(), lightSource);
+  }
 }

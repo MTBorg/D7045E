@@ -10,6 +10,7 @@
 class Scene {
 public:
   std::vector<GraphicsNode> objectsMovable;
+  std::vector<GraphicsNode> objectsStatic;
   Camera camera;
   LightSource lightSource;
 

@@ -153,10 +153,61 @@ bool Lab4::Open() {
         glm::translate(glm::mat4(1), glm::vec3(0, -1, -2)));
     animatedCube.setAnimation(oscillate);
 
+    // The floor of the room
     auto floor = GraphicsNode(
         Mesh::createCuboid(), new MonochromeMaterial(RGBA(0.5, 0.5, 0.5, 1)),
-        glm::translate(glm::mat4(1), glm::vec3(0, -5, 0)));
+        glm::translate(glm::mat4(1), glm::vec3(0, -10, 0)));
     floor.scale(1000, 1, 1000);
+
+    this->scene.objectsStatic = std::vector<GraphicsNode>{
+        GraphicsNode(Mesh::createCuboid(),
+                     new MonochromeMaterial(RGBA(1, 1, 1, 1)),
+                     glm::translate(glm::mat4(1), glm::vec3(-10, -3, -20))),
+        GraphicsNode(Mesh::createCuboid(),
+                     new MonochromeMaterial(RGBA(1, 0, 1, 1)),
+                     glm::translate(glm::mat4(1), glm::vec3(10, 3, -20))),
+        GraphicsNode(Mesh::createCuboid(),
+                     new MonochromeMaterial(RGBA(0, 1, 1, 1)),
+                     glm::translate(glm::mat4(1), glm::vec3(-5, -2, -15))),
+        GraphicsNode(Mesh::createCuboid(),
+                     new MonochromeMaterial(RGBA(1, 1, 0, 1)),
+                     glm::translate(glm::mat4(1), glm::vec3(0, -5, -10))),
+        GraphicsNode(Mesh::createCuboid(),
+                     new MonochromeMaterial(RGBA(1, 0.5, 0, 1)),
+                     glm::translate(glm::mat4(1), glm::vec3(0, -5, -20))),
+        GraphicsNode(Mesh::createCuboid(),
+                     new MonochromeMaterial(RGBA(0, 0, 0, 1)),
+                     glm::translate(glm::mat4(1), glm::vec3(0, -2, -30))),
+        GraphicsNode(Mesh::createCuboid(),
+                     new MonochromeMaterial(RGBA(1, 0.5, 0.2, 1)),
+                     glm::translate(glm::mat4(1), glm::vec3(1, -8, -10))),
+        GraphicsNode(Mesh::createCuboid(),
+                     new MonochromeMaterial(RGBA(1, 1, 0, 1)),
+                     glm::translate(glm::mat4(1), glm::vec3(-4, -5, -17))),
+        GraphicsNode(Mesh::createCuboid(),
+                     new MonochromeMaterial(RGBA(1, 1, 1, 1)),
+                     glm::translate(glm::mat4(1), glm::vec3(-10, -3, 5))),
+        GraphicsNode(Mesh::createCuboid(),
+                     new MonochromeMaterial(RGBA(1, 0, 1, 1)),
+                     glm::translate(glm::mat4(1), glm::vec3(4, 1, 3))),
+        GraphicsNode(Mesh::createCuboid(),
+                     new MonochromeMaterial(RGBA(0, 1, 1, 1)),
+                     glm::translate(glm::mat4(1), glm::vec3(-1, -6, -15))),
+        GraphicsNode(Mesh::createCuboid(),
+                     new MonochromeMaterial(RGBA(1, 1, 0, 1)),
+                     glm::translate(glm::mat4(1), glm::vec3(0, -5, -12))),
+        GraphicsNode(Mesh::createCuboid(),
+                     new MonochromeMaterial(RGBA(1, 0.5, 0, 1)),
+                     glm::translate(glm::mat4(1), glm::vec3(0, -5, -20))),
+        GraphicsNode(Mesh::createCuboid(),
+                     new MonochromeMaterial(RGBA(0, 0, 0, 1)),
+                     glm::translate(glm::mat4(1), glm::vec3(0, -2, -30))),
+        GraphicsNode(Mesh::createCuboid(),
+                     new MonochromeMaterial(RGBA(1, 0.5, 0.2, 1)),
+                     glm::translate(glm::mat4(1), glm::vec3(1, -8, -10))),
+        GraphicsNode(Mesh::createCuboid(),
+                     new MonochromeMaterial(RGBA(1, 1, 0, 1)),
+                     glm::translate(glm::mat4(1), glm::vec3(-4, -5, -17)))};
 
     this->scene.objectsMovable = std::vector<GraphicsNode>{
         animatedCube,
