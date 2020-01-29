@@ -43,6 +43,10 @@ public:
     }
 
     transformUpdates.clear();
+
+    for (auto &child : children) {
+      child->update();
+    }
   }
 
   inline void addTransformUpdate(glm::mat4 update) {
