@@ -21,6 +21,8 @@ public:
   bool Open();
   void Run();
   void initObjects();
+  void initAnimatedObjects();
+  void initStaticObjects();
 
 private:
   Display::Window *window;
