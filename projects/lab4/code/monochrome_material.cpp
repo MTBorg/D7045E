@@ -9,7 +9,6 @@ void MonochromeMaterial::applyMaterial(const glm::mat4 &transform,
                                        const LightSource &lightSource) {
   shaderProgram->activate();
 
-  // TODO: Should this really be the responsibility of the material?
   GLint modelUniform = glGetUniformLocation(shaderProgram->program, "model");
   if (modelUniform != -1) {
     glUniformMatrix4fv(modelUniform, 1, GL_FALSE, &transform[0][0]);
@@ -17,7 +16,6 @@ void MonochromeMaterial::applyMaterial(const glm::mat4 &transform,
     printf("Failed to locate uniform model\n");
   }
 
-  // TODO: Should this really be the responsibility of the material?
   GLint viewUniform = glGetUniformLocation(shaderProgram->program, "view");
   if (viewUniform != -1) {
     glUniformMatrix4fv(viewUniform, 1, GL_FALSE, &view[0][0]);
@@ -25,7 +23,6 @@ void MonochromeMaterial::applyMaterial(const glm::mat4 &transform,
     printf("Failed to locate uniform view\n");
   }
 
-  // TODO: Should this really be the responsibility of the material?
   GLint projectionUniform =
       glGetUniformLocation(shaderProgram->program, "projection");
   if (projectionUniform != -1) {

@@ -208,14 +208,20 @@ void Lab4::Run() {
 }
 
 void Lab4::initAnimatedObjects() {
+  auto cube = NEW_CUBE_LEAF(glm::vec3(0, 2, 2), RGBA(0.5, 0.5, 0.5, 1));
+  auto _cube = NEW_CUBE_LEAF(glm::vec3(0, 2, 2), RGBA(0.5, 0.5, 0.5, 1));
+  auto cube0 = NEW_CUBE_LEAF(glm::vec3(-2, 0, 0), RGBA(1, 0, 1, 1));
   auto cube1 =
       NEW_CUBE_LEAF(glm::vec3(0, 1, 0),
                     RGBA(1, 0, 0, 1)); // This node forms a path with depth 3
   auto cube2 = NEW_CUBE(glm::vec3(1, 0, -5), RGBA(0, 1, 0, 1),
                         std::vector<GraphicsNode *>{cube1});
-  auto cube3 = NEW_CUBE_LEAF(glm::vec3(4, 0, 0), RGBA(1, 1, 0, 1));
-  auto cube4 = NEW_CUBE_LEAF(glm::vec3(-4, 0, 0), RGBA(0, 1, 1, 1));
-  auto cube5 = NEW_CUBE_LEAF(glm::vec3(0, 5, 0), RGBA(0, 1, 1, 1));
+  auto cube3 = NEW_CUBE(glm::vec3(4, 0, 0), RGBA(1, 1, 0, 1),
+                        std::vector<GraphicsNode *>{cube0});
+  auto cube4 = NEW_CUBE(glm::vec3(-4, 0, 0), RGBA(0, 1, 1, 1),
+                        std::vector<GraphicsNode *>{cube});
+  auto cube5 = NEW_CUBE(glm::vec3(0, 5, 0), RGBA(0, 1, 1, 1),
+                        std::vector<GraphicsNode *>{_cube});
   auto rootChildren = std::vector<GraphicsNode *>{cube2, cube3, cube4, cube5};
   auto root = NEW_CUBE(glm::vec3(0, 0, -10), RGBA(1, 1, 1, 1), rootChildren);
 
@@ -275,17 +281,17 @@ void Lab4::initStaticObjects() {
 
       GraphicsNode(Mesh::createCuboid(),
                    new MonochromeMaterial(RGBA(1, 1, 0, 1)),
-                   glm::translate(glm::mat4(1), glm::vec3(0, -5, -12))),
+                   glm::translate(glm::mat4(1), glm::vec3(0, 5, -12))),
       GraphicsNode(Mesh::createCuboid(),
                    new MonochromeMaterial(RGBA(1, 0.5, 0, 1)),
                    glm::translate(glm::mat4(1), glm::vec3(0, -5, -20))),
       GraphicsNode(Mesh::createCuboid(),
                    new MonochromeMaterial(RGBA(0, 0, 0, 1)),
-                   glm::translate(glm::mat4(1), glm::vec3(0, -2, -30))),
+                   glm::translate(glm::mat4(1), glm::vec3(0, -7, -30))),
       GraphicsNode(Mesh::createCuboid(),
                    new MonochromeMaterial(RGBA(1, 0.5, 0.2, 1)),
-                   glm::translate(glm::mat4(1), glm::vec3(1, -8, -10))),
+                   glm::translate(glm::mat4(1), glm::vec3(1, 8, -10))),
       GraphicsNode(Mesh::createCuboid(),
                    new MonochromeMaterial(RGBA(1, 1, 0, 1)),
-                   glm::translate(glm::mat4(1), glm::vec3(-4, -5, -17)))};
+                   glm::translate(glm::mat4(1), glm::vec3(-4, -9, -17)))};
 }
