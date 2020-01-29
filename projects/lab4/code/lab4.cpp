@@ -19,9 +19,11 @@ Lab4::~Lab4() {}
 
 const float32 movingDistance = 0.1f;
 const float32 rotationAngle = 5.0f;
+const float32 lightSpeed = 0.2f;
 
 unsigned int currentObject = 0;
 bool cameraSelected = false;
+bool lightSelected = false;
 const float32 cameraRotationAngle = 1.0f;
 
 #define NEW_CUBE_LEAF(pos, color)                                              \
@@ -71,16 +73,33 @@ void handleCameraControls(int32 keyCode, int32 action, Scene &scene) {
   }
 }
 
+void handleLightControls(int32 keyCode, Scene &scene) {
+  switch (keyCode) {
+  case GLFW_KEY_W:
+    scene.lightSource.translate(glm::vec3(0, 0, -lightSpeed));
+    break;
+  case GLFW_KEY_A:
+    scene.lightSource.translate(glm::vec3(-lightSpeed, 0, 0));
+    break;
+  case GLFW_KEY_S:
+    scene.lightSource.translate(glm::vec3(0, 0, lightSpeed));
+    break;
+  case GLFW_KEY_D:
+    scene.lightSource.translate(glm::vec3(lightSpeed, 0, 0));
+    break;
+  case GLFW_KEY_E:
+    scene.lightSource.translate(glm::vec3(0, -lightSpeed, 0));
+    break;
+  case GLFW_KEY_Q:
+    scene.lightSource.translate(glm::vec3(0, lightSpeed, 0));
+    break;
+  }
+}
+
 void handleObjectControls(int32 keyCode, int32 action, Scene &scene) {
   switch (keyCode) {
   case GLFW_KEY_1:
-  case GLFW_KEY_2:
-  case GLFW_KEY_3:
     currentObject = keyCode - GLFW_KEY_1;
-    break;
-  case GLFW_KEY_W:
-    scene.objectsMovable[currentObject]->addTransformUpdate(
-        glm::translate(glm::mat4(1), glm::vec3(0, 0, -movingDistance)));
     break;
   case GLFW_KEY_A:
     scene.objectsMovable[currentObject]->addTransformUpdate(
@@ -136,14 +155,24 @@ bool Lab4::Open() {
       [this](int32 keyCode, int32, int32 action, int32) {
         switch (keyCode) {
         case GLFW_KEY_C:
-          if (action == GLFW_RELEASE)
+          if (action == GLFW_RELEASE) {
+            lightSelected = false;
             cameraSelected = !cameraSelected;
+          }
+          break;
+        case GLFW_KEY_V:
+          if (action == GLFW_RELEASE) {
+            cameraSelected = false;
+            lightSelected = true;
+          }
           break;
         case GLFW_KEY_ESCAPE:
           this->window->Close();
         default:
           if (cameraSelected) {
             handleCameraControls(keyCode, action, this->scene);
+          } else if (lightSelected) {
+            handleLightControls(keyCode, this->scene);
           } else {
             handleObjectControls(keyCode, action, this->scene);
           }

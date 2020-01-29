@@ -3,6 +3,9 @@
 
 #include "node.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "types.h"
 
 class LightSource : public Node {
@@ -16,6 +19,10 @@ public:
 
   inline RGB getColor() const { return color; }
   inline float getIntensity() const { return intensity; }
+
+  inline void translate(glm::vec3 direction) {
+    transform = glm::translate(transform, direction);
+  }
 };
 
 #endif
