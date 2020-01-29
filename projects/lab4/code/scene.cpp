@@ -1,6 +1,12 @@
 #include "scene.h"
 
 void Scene::render() {
+
+  // time = getCurrentTime()
+  //
+  // deltaTime = time - lastTime
+  //
+  // multiply updates with deltaTime
   for (auto &object : objectsMovable) {
     object->update();
   }

@@ -24,7 +24,7 @@ private:
       "{\n"
       "	gl_Position = projection * view * model * vec4(pos, 1.0);\n"
       " FragmentPos = vec3(model * vec4(pos, 1.0));\n"
-      " Normal = normal; \n"
+      " Normal = mat3(transpose(inverse(model))) * normal;\n"
       "}\n";
   static constexpr const GLchar *fragmentShader =
       "#version 310 es\n"
@@ -44,10 +44,12 @@ private:
       " float specularStrength = 0.5f;\n"
 
       " vec3 norm = normalize(Normal);\n"
-      " vec3 lightDir = normalize(lightPos - FragmentPos); \n"
       " vec3 ambient = ambientStrength * lightColor; \n"
+
+      " vec3 lightDir = normalize(lightPos - FragmentPos); \n"
       " float diff = max(dot(norm, lightDir), 0.0);\n"
       " vec3 diffuse = diff * lightColor;\n"
+
       " vec3 viewDir = normalize(cameraPos - FragmentPos);\n"
       " vec3 reflectDir = reflect(-lightDir, norm);\n"
       " float spec = pow(max(dot(viewDir, reflectDir), 0.0f), 32.f);\n"

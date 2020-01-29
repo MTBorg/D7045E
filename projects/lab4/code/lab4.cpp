@@ -17,9 +17,9 @@ using namespace Display;
 Lab4::Lab4() {}
 Lab4::~Lab4() {}
 
-const float32 movingDistance = 0.1f;
+const float32 movingDistance = 0.2f;
 const float32 rotationAngle = 5.0f;
-const float32 lightSpeed = 0.2f;
+const float32 lightSpeed = 0.4f;
 
 unsigned int currentObject = 0;
 bool cameraSelected = false;
@@ -100,6 +100,10 @@ void handleObjectControls(int32 keyCode, int32 action, Scene &scene) {
   switch (keyCode) {
   case GLFW_KEY_1:
     currentObject = keyCode - GLFW_KEY_1;
+    break;
+  case GLFW_KEY_W:
+    scene.objectsMovable[currentObject]->addTransformUpdate(
+        glm::translate(glm::mat4(1), glm::vec3(0, 0, -movingDistance)));
     break;
   case GLFW_KEY_A:
     scene.objectsMovable[currentObject]->addTransformUpdate(
